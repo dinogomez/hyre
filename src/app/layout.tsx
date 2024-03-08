@@ -17,9 +17,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <div className="min-h-screen bg-neutral-950 ">
+      <div className="">
         <body className={inter.className}>{children}</body>
-        <BackgroundBeams />
       </div>
     </html>
   );
