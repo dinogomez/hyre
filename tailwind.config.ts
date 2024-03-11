@@ -25,8 +25,18 @@ const config = {
       },
     },
     extend: {
+      extend: {
+        padding: {
+          '0.3': '0.075rem', // Define a padding value of 0.075rem for py-0.3
+        },
+      },
+      fontFamily: {
+        sans: ['var(--font-geist-sans)'],
+        mono: ['var(--font-geist-mono)'],
+      },
       colors: {
         border: "hsl(var(--border))",
+        highlight: "hsl(220, 94%, 33%)",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
