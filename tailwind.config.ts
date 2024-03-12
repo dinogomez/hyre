@@ -30,6 +30,7 @@ const config = {
           '0.3': '0.075rem', // Define a padding value of 0.075rem for py-0.3
         },
       },
+      
       fontFamily: {
         sans: ['var(--font-geist-sans)'],
         mono: ['var(--font-geist-mono)'],
