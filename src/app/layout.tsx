@@ -6,12 +6,16 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import Provider from "@/components/provider";
 import Header from "@/components/header";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Horizon",
   description: "Horizon: Human Resource Information System",
+  icons: {
+    icon: "/horizon.ico",
+  },
 };
 
 export default function RootLayout({
@@ -27,6 +31,7 @@ export default function RootLayout({
         <Provider>
           <Header />
           {children}
+          <Toaster />
           <div>
             <BackgroundBeams />
           </div>

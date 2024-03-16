@@ -1,15 +1,14 @@
 import { Checkbox } from "./ui/checkbox";
 import { Button } from "./ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogTrigger,
-} from "./ui/dialog";
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogTrigger,
+} from "./ui/alert-dialog";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Skills } from "@/lib/config";
-import { SignUpSchema } from "@/lib/schema/signup.schema";
+import { SignUpSchema } from "@/lib/schema/zod/signup.schema";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,6 +21,8 @@ import {
   FormLabel,
   FormMessage,
 } from "./ui/form";
+import { signUp } from "@/lib/actions/auth.actions";
+import { toast } from "./ui/use-toast";
 
 type SignUpSchemaValues = z.infer<typeof SignUpSchema>;
 
@@ -38,13 +39,24 @@ function SignUp() {
     },
   });
 
-  function onSubmit(data: SignUpSchemaValues) {
-    console.log(data);
+  async function onSubmit(values: SignUpSchemaValues) {
+    const res = await signUp(values);
+    if (res.error) {
+      toast({
+        variant: "destructive",
+        description: res.error,
+      });
+    } else {
+      toast({
+        variant: "default",
+        description: "Account created successfully",
+      });
+    }
   }
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
         <Button size="sm" variant="secondary" className="font-bold">
           Get Started
           <svg
@@ -58,8 +70,8 @@ function SignUp() {
             <path d="M5 12h14M12 5l7 7-7 7"></path>
           </svg>
         </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[525px] ">
+      </AlertDialogTrigger>
+      <AlertDialogContent className="sm:max-w-[525px] ">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="">
             <div className="grid gap-4 py-4 space-y-5">
@@ -232,8 +244,8 @@ function SignUp() {
             </Button>
           </form>
         </Form>
-      </DialogContent>
-    </Dialog>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
 

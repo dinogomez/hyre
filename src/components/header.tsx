@@ -2,8 +2,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import SignIn from "./signin";
-import SignUp from "./signup";
+import SignIn from "./auth.signin";
+import SignUp from "./auth.signup";
 
 function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
