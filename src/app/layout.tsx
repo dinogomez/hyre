@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { BackgroundBeams } from "@/components/ui/background-beams";
-import Header from "@/components/header";
-import { ThemeProvider } from "@/components/provider/theme-provider";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
+import Provider from "@/components/provider";
+import Header from "@/components/header";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,21 +21,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="dark"
-        disableTransitionOnChange
+      <body
+        className={`${GeistSans.variable} ${GeistMono.variable} font-mono bg-neutral-900`}
       >
-        <body
-          className={`${GeistSans.variable} ${GeistMono.variable} font-mono bg-neutral-900 text-white min-h-80`}
-        >
+        <Provider>
           <Header />
           {children}
           <div>
             <BackgroundBeams />
           </div>
-        </body>
-      </ThemeProvider>
+        </Provider>
+      </body>
     </html>
   );
 }

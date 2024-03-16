@@ -12,14 +12,26 @@ export default function Home() {
       <section className="">
         <div className="container mx-auto flex px-5 py-24 items-center justify-center flex-col">
           <div className="text-center w-full">
-            <div className="flex justify-center space-x-2">
-              <Badge className="bg-purple-600 hover:bg-purple-400">
-                Find Work
-              </Badge>
-              <Badge className="bg-blue-600 hover:bg-blue-400">
-                Find Workers
-              </Badge>
-            </div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{
+                type: "spring",
+                stiffness: 260,
+                damping: 20,
+                duration: 0.5,
+                delay: 0.25,
+              }}
+            >
+              <div className="flex justify-center space-x-2">
+                <Badge className="bg-purple-600 hover:bg-purple-400">
+                  Find Work
+                </Badge>
+                <Badge className="bg-blue-600 hover:bg-blue-400">
+                  Find Workers
+                </Badge>
+              </div>
+            </motion.div>
             <motion.div
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -37,13 +49,14 @@ export default function Home() {
                 </span>
                 <span className="underline decoration-highlight">Horizon</span>!
               </h1>
+
+              <div className="md:text-2xl text-center text-lg mb-4 font-black leading-relaxed tracking-tighter text-white"></div>
+              <p className="lg:w-3/5 w-full mb-8 leading-relaxed mx-auto  font-semibold text-md text-neutral-400">
+                Discover your next opportunity effortlessly with Horizon. The
+                intuitive recruitment platform connecting talent with great
+                careers.
+              </p>
             </motion.div>
-            <div className="md:text-2xl text-center text-lg mb-4 font-black leading-relaxed tracking-tighter text-white"></div>
-            <p className="lg:w-3/5 w-full mb-8 leading-relaxed mx-auto  font-semibold text-md text-neutral-400">
-              Discover your next opportunity effortlessly with Horizon. The
-              intuitive recruitment platform connecting talent with great
-              careers.
-            </p>
           </div>
         </div>
       </section>
