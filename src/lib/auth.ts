@@ -2,7 +2,20 @@ import { Lucia } from "lucia";
 import { cookies } from "next/headers";
 import { cache } from "react";
 import adapter from "./db/adapter";
+import { getFullName } from "./utils";
+
+interface DatabaseUserAttributes {
+  firstName: string;
+  lastName: string;
+}
+
 export const lucia = new Lucia(adapter, {
+  getUserAttributes: (attributes) => {
+    return {
+      firstName: attributes.firstName,
+      lastName: attributes.lastName,
+    };
+  },
   sessionCookie: {
     // this sets cookies with super long expiration
     // since Next.js doesn't allow Lucia to extend cookie expiration when rendering pages
@@ -16,12 +29,13 @@ export const lucia = new Lucia(adapter, {
 
 export const getUser = cache(async () => {
   const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
-  if (!sessionId) {
+
+  if (!sessionId)
     return {
       user: null,
       session: null,
     };
-  }
+
   const { user, session } = await lucia.validateSession(sessionId);
   try {
     if (session && session.fresh) {
@@ -40,9 +54,7 @@ export const getUser = cache(async () => {
         sessionCookie.attributes
       );
     }
-  } catch {
-    // Next.js throws error when attempting to set cookies when rendering page
-  }
+  } catch {}
   return {
     user,
     session,
@@ -53,5 +65,6 @@ export const getUser = cache(async () => {
 declare module "lucia" {
   interface Register {
     Lucia: typeof lucia;
+    DatabaseUserAttributes: DatabaseUserAttributes;
   }
 }

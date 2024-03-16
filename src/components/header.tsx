@@ -1,33 +1,33 @@
-"use client";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import SignIn from "./auth.signin";
 import SignUp from "./auth.signup";
+import AuthSign from "./auth.sign";
 
 function Header() {
-  const [isScrolled, setIsScrolled] = useState(false);
+  // const [isScrolled, setIsScrolled] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-      if (scrollPosition > 0) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
+  // useEffect(() => {
+  //   const handleScroll = () => {
+  //     const scrollPosition = window.scrollY;
+  //     if (scrollPosition > 0) {
+  //       setIsScrolled(true);
+  //     } else {
+  //       setIsScrolled(false);
+  //     }
+  //   };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  //   window.addEventListener("scroll", handleScroll);
+  //   return () => window.removeEventListener("scroll", handleScroll);
+  // }, []);
 
-  const headerClasses = `text-gray-600 sticky top-0${
-    isScrolled ? "border-b border-neutral-800 bg-neutral-900" : ""
-  }`;
+  // const headerClasses = `text-gray-600 sticky top-0${
+  //   isScrolled ? "border-b border-neutral-800 bg-neutral-900" : ""
+  // }`;
 
   return (
-    <header className={headerClasses}>
+    <header className="text-gray-600 sticky top-0">
       <div className="container md:justify-between flex flex-wrap p-5 flex-col md:flex-row items-center">
         <Link
           href="/"
@@ -46,10 +46,7 @@ function Header() {
           <a className="mr-5 hover:text-gray-900">Third Link</a>
           <a className="mr-5 hover:text-gray-900">Fourth Link</a>
         </nav> */}
-        <div className="flex space-x-12 items-center text-white">
-          <SignIn />
-          <SignUp />
-        </div>
+        <AuthSign />
       </div>
     </header>
   );

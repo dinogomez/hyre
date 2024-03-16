@@ -1,11 +1,12 @@
+"use client";
 import {
-  AlertDialogDescription,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogTrigger,
-} from "./ui/alert-dialog";
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from "./ui/dialog";
 import { Input } from "./ui/input";
 import { SignInSchema } from "@/lib/schema/zod/signup.schema";
 import { z } from "zod";
@@ -16,10 +17,13 @@ import { signIn } from "@/lib/actions/auth.actions";
 import { toast } from "./ui/use-toast";
 import { redirect } from "next/navigation";
 import { Button } from "./ui/button";
+import { useRouter } from "next/navigation";
 
 type SignInSchemaValues = z.infer<typeof SignInSchema>;
 
 function SignIn() {
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof SignInSchema>>({
     resolver: zodResolver(SignInSchema),
     defaultValues: {
@@ -41,24 +45,24 @@ function SignIn() {
         description: res.success,
       });
 
-      return redirect("/dashboard");
+      router.push("/dashboard");
     }
   }
   return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
+    <Dialog>
+      <DialogTrigger asChild>
         <h1 className="hover:underline cursor-pointer decoration-4 underline-offset-8 font-bold hover:decoration-purple-600">
           Sign In
         </h1>
-      </AlertDialogTrigger>
-      <AlertDialogContent className="sm:max-w-[425px]">
-        <AlertDialogHeader>
-          <AlertDialogTitle>Login</AlertDialogTitle>
-          <AlertDialogDescription>Search your horizon!</AlertDialogDescription>
-        </AlertDialogHeader>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px] s">
+        <DialogHeader>
+          <DialogTitle>Login</DialogTitle>
+          <DialogDescription>Search your horizon!</DialogDescription>
+        </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="">
-            <div className="grid gap-4 py-4 space-y-3">
+            <div className="grid gap-4 py-4 space-y-5 mb-6">
               <div className="flex items-center gap-4">
                 <div className="flex-1">
                   <FormField
@@ -109,8 +113,8 @@ function SignIn() {
             </Button>
           </form>
         </Form>
-      </AlertDialogContent>
-    </AlertDialog>
+      </DialogContent>
+    </Dialog>
   );
 }
 

@@ -1,12 +1,9 @@
+"use client";
+
 import { Checkbox } from "./ui/checkbox";
 import { Button } from "./ui/button";
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogTrigger,
-} from "./ui/alert-dialog";
+
 import { Input } from "./ui/input";
-import { Label } from "./ui/label";
 import { Skills } from "@/lib/config";
 import { SignUpSchema } from "@/lib/schema/zod/signup.schema";
 import { useForm } from "react-hook-form";
@@ -23,10 +20,14 @@ import {
 } from "./ui/form";
 import { signUp } from "@/lib/actions/auth.actions";
 import { toast } from "./ui/use-toast";
+import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
+import { useRouter } from "next/navigation";
 
 type SignUpSchemaValues = z.infer<typeof SignUpSchema>;
 
 function SignUp() {
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof SignUpSchema>>({
     resolver: zodResolver(SignUpSchema),
     defaultValues: {
@@ -51,12 +52,14 @@ function SignUp() {
         variant: "default",
         description: "Account created successfully",
       });
+
+      router.push("/dashboard");
     }
   }
 
   return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
+    <Dialog>
+      <DialogTrigger asChild>
         <Button size="sm" variant="secondary" className="font-bold">
           Get Started
           <svg
@@ -70,8 +73,8 @@ function SignUp() {
             <path d="M5 12h14M12 5l7 7-7 7"></path>
           </svg>
         </Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent className="sm:max-w-[525px] ">
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[525px] ">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="">
             <div className="grid gap-4 py-4 space-y-5">
@@ -244,8 +247,8 @@ function SignUp() {
             </Button>
           </form>
         </Form>
-      </AlertDialogContent>
-    </AlertDialog>
+      </DialogContent>
+    </Dialog>
   );
 }
 
