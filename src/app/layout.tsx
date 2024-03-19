@@ -11,32 +11,32 @@ import { Toaster } from "@/components/ui/toaster";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Horizon",
-  description: "Horizon: Human Resource Information System",
-  icons: {
-    icon: "/horizon.ico",
-  },
+    title: "Horizon",
+    description: "Horizon: Human Resource Information System",
+    icons: {
+        icon: "/horizon.ico",
+    },
 };
 
 export default function RootLayout({
-  children,
+    children,
 }: Readonly<{
-  children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body
-        className={`${GeistSans.variable} ${GeistMono.variable} font-mono bg-neutral-900`}
-      >
-        <Provider>
-          <Header />
-          {children}
-          <Toaster />
-          <div>
-            <BackgroundBeams />
-          </div>
-        </Provider>
-      </body>
-    </html>
-  );
+    return (
+        <html lang="en">
+            <body
+                className={`${GeistSans.variable} ${GeistMono.variable} bg-neutral-900 font-mono`}
+            >
+                <Provider>
+                    <Header />
+                    {children}
+                    <Toaster />
+                    <div>
+                        <BackgroundBeams />
+                    </div>
+                </Provider>
+            </body>
+        </html>
+    );
 }

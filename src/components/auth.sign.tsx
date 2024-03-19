@@ -7,25 +7,25 @@ import { signOut } from "@/lib/actions/auth.actions";
 import DashboardButton from "./auth.dashboard-button";
 
 async function AuthSign() {
-  const { user } = await getUser();
+    const { user } = await getUser();
 
-  return (
-    <div className="flex space-x-12 items-center text-white">
-      {user ? (
-        <>
-          <DashboardButton />
-          <form action={signOut}>
-            <Button>Sign Out</Button>
-          </form>
-        </>
-      ) : (
-        <>
-          <SignIn label="Sign In" />
-          <SignUp label="Get Started" />
-        </>
-      )}
-    </div>
-  );
+    return (
+        <div className="flex items-center space-x-12 text-white">
+            {user ? (
+                <>
+                    <DashboardButton />
+                    <form action={signOut}>
+                        <Button>Sign Out</Button>
+                    </form>
+                </>
+            ) : (
+                <>
+                    <SignIn label="Sign In" />
+                    <SignUp label="Get Started" />
+                </>
+            )}
+        </div>
+    );
 }
 
 export default AuthSign;
