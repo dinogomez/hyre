@@ -20,8 +20,8 @@ async function AuthSign() {
         </>
       ) : (
         <>
-          <SignIn />
-          <SignUp />
+          <SignIn label="Sign In" />
+          <SignUp label="Get Started" />
         </>
       )}
     </div>

@@ -17,6 +17,8 @@ export const signUp = async (values: z.infer<typeof SignUpSchema>) => {
     return { error: "Invalid Fields" };
   }
   const hashedPassword = await new Argon2id().hash(values.password);
+
+  console.log(hashedPassword);
   const userId = generateId(15);
 
   try {
@@ -57,12 +59,12 @@ export const signIn = async (values: z.infer<typeof SignInSchema>) => {
 
   if (!existUser) {
     return {
-      error: "User Not Found",
+      error: "Incorrect Credentials",
     };
   }
   if (!existUser.password) {
     return {
-      error: "User Not Found",
+      error: "Incorrect Credentials",
     };
   }
 
@@ -90,7 +92,7 @@ export const signIn = async (values: z.infer<typeof SignInSchema>) => {
   );
 
   return {
-    success: "Login Succesfull!",
+    success: "Launching Horizon!",
   };
 };
 
