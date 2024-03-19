@@ -19,7 +19,7 @@ import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
 import SignUp from "./auth.signup";
 import { AlertTriangleIcon } from "lucide-react";
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 
 type SignInSchemaValues = z.infer<typeof SignInSchema>;
 

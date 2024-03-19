@@ -1,8 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import SignIn from "./auth.signin";
-import SignUp from "./auth.signup";
 import AuthSign from "./auth.sign";
 
 function Header() {

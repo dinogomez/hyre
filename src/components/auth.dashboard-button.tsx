@@ -1,6 +1,5 @@
 "use client";
 import { usePathname } from "next/navigation";
-import { Button } from "./ui/button";
 import Link from "next/link";
 function DashboardButton() {
     const pathname = usePathname();

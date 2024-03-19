@@ -2,7 +2,6 @@ import { Lucia } from "lucia";
 import { cookies } from "next/headers";
 import { cache } from "react";
 import adapter from "./db/adapter";
-import { getFullName } from "./utils";
 
 interface DatabaseUserAttributes {
     firstName: string;

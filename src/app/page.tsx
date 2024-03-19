@@ -1,8 +1,5 @@
 "use client";
 
-import Image from "next/image";
-import { BentoGridSection } from "./_components/bento-grid-section";
-
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 

@@ -1,23 +1,13 @@
 "use client";
 
-import { Checkbox } from "./ui/checkbox";
 import { Button } from "./ui/button";
 
 import { Input } from "./ui/input";
-import { Skills } from "@/lib/config";
 import { SignUpSchema } from "@/lib/schema/zod/signup.schema";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "./ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "./ui/form";
 import { signUp } from "@/lib/actions/auth.actions";
 import { toast } from "./ui/use-toast";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
