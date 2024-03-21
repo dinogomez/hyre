@@ -9,7 +9,7 @@ async function Dashboard() {
         return redirect("/");
     }
     return (
-        <div className="flex w-full justify-center text-2xl">
+        <div className="flex h-full w-full flex-1 items-center justify-center text-2xl">
             dashboard hi, {getFullName(user)}
         </div>
     );

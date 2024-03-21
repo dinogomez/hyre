@@ -11,7 +11,7 @@ import { eq } from "drizzle-orm";
 
 export const signUp = async (values: z.infer<typeof SignUpSchema>) => {
     const status = SignUpSchema.safeParse(values);
-    const { password, ...iValues } = values;
+    const { password, email, ...iValues } = values;
 
     if (!status.success) {
         return { error: "Invalid Fields" };
@@ -27,6 +27,7 @@ export const signUp = async (values: z.infer<typeof SignUpSchema>) => {
             .values({
                 id: userId,
                 password: hashedPassword,
+                email: values.email.toLowerCase(),
                 ...iValues,
             })
             .returning({
@@ -54,7 +55,7 @@ export const signUp = async (values: z.infer<typeof SignUpSchema>) => {
 
 export const signIn = async (values: z.infer<typeof SignInSchema>) => {
     const existUser = await db.query.userTable.findFirst({
-        where: (table) => eq(table.email, values.email),
+        where: (table) => eq(table.email, values.email.toLocaleLowerCase()),
     });
 
     if (!existUser) {
@@ -79,8 +80,10 @@ export const signIn = async (values: z.infer<typeof SignInSchema>) => {
         };
     }
 
+    const expiresIn = values.keepLogin ? 60 * 60 * 24 * 7 : 60 * 60 * 12;
+
     const session = await lucia.createSession(existUser.id, {
-        expiresIn: 60 * 60 * 24,
+        expiresIn: expiresIn,
     });
 
     const sessionCookie = lucia.createSessionCookie(session.id);

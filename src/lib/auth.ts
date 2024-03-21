@@ -6,6 +6,7 @@ import adapter from "./db/adapter";
 interface DatabaseUserAttributes {
     firstName: string;
     lastName: string;
+    email: string;
 }
 
 export const lucia = new Lucia(adapter, {
@@ -13,6 +14,7 @@ export const lucia = new Lucia(adapter, {
         return {
             firstName: attributes.firstName,
             lastName: attributes.lastName,
+            email: attributes.email,
         };
     },
     sessionCookie: {

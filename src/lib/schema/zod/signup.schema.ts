@@ -14,9 +14,6 @@ export const SignUpSchema = z
         confirm: z.string().min(1, {
             message: "Confirm your password",
         }),
-        // skills: z.array(z.string()).refine((value) => value.some((item) => item), {
-        //   message: "You have to select at least one skill.",
-        // }),
     })
     .refine((data) => data.password === data.confirm, {
         message: "Passwords don't match",
@@ -30,4 +27,8 @@ export const SignInSchema = z.object({
     password: z.string().min(1, {
         message: "Password is required",
     }),
+    keepLogin: z.boolean().default(false).optional(),
 });
+// skills: z.array(z.string()).refine((value) => value.some((item) => item), {
+//   message: "You have to select at least one skill.",
+// }),

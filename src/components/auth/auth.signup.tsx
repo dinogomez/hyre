@@ -1,16 +1,21 @@
 "use client";
 
-import { Button } from "./ui/button";
-
-import { Input } from "./ui/input";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { SignUpSchema } from "@/lib/schema/zod/signup.schema";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "./ui/form";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormMessage,
+} from "../ui/form";
 import { signUp } from "@/lib/actions/auth.actions";
-import { toast } from "./ui/use-toast";
-import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
+import { toast } from "@/components/ui/use-toast";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -61,9 +66,11 @@ function SignUp({ label, ghost = false }: SignUpProps) {
         <Dialog>
             <DialogTrigger asChild>
                 {ghost ? (
-                    <h1 className="font-bold text-purple-600">{label}</h1>
+                    <h1 className="cursor-pointer font-bold text-primary">
+                        {label}
+                    </h1>
                 ) : (
-                    <Button size="sm" variant="secondary" className="font-bold">
+                    <Button size="sm" className="rounded-none font-bold">
                         {label}
                         <svg
                             fill="none"
