@@ -15,9 +15,19 @@ import {
 } from "../ui/form";
 import { signUp } from "@/lib/actions/auth.actions";
 import { toast } from "@/components/ui/use-toast";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { ExternalLink } from "lucide-react";
+import Link from "next/link";
 
 type SignUpSchemaValues = z.infer<typeof SignUpSchema>;
 
@@ -70,7 +80,7 @@ function SignUp({ label, ghost = false }: SignUpProps) {
                         {label}
                     </h1>
                 ) : (
-                    <Button size="sm" className="rounded-none font-bold">
+                    <Button size="lg" className=" text-base font-bold">
                         {label}
                         <svg
                             fill="none"
@@ -86,16 +96,20 @@ function SignUp({ label, ghost = false }: SignUpProps) {
                 )}
             </DialogTrigger>
             <DialogContent className="sm:max-w-[525px] ">
+                <DialogHeader className="">
+                    <DialogTitle>Create your account</DialogTitle>
+                    <DialogDescription>Applicant Form</DialogDescription>
+                </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="">
-                        <div className="grid gap-4 space-y-5 py-4">
+                        <div className="grid gap-4 py-4">
                             <div className="flex items-center gap-4">
                                 <div className="flex-1">
                                     <FormField
                                         control={form.control}
                                         name="firstName"
                                         render={({ field }) => (
-                                            <FormItem className="h-12">
+                                            <FormItem>
                                                 <FormControl>
                                                     <Input
                                                         placeholder="First Name"
@@ -115,7 +129,7 @@ function SignUp({ label, ghost = false }: SignUpProps) {
                                         control={form.control}
                                         name="lastName"
                                         render={({ field }) => (
-                                            <FormItem className="h-12">
+                                            <FormItem>
                                                 <FormControl>
                                                     <Input
                                                         placeholder="Last Name"
@@ -137,7 +151,7 @@ function SignUp({ label, ghost = false }: SignUpProps) {
                                         control={form.control}
                                         name="email"
                                         render={({ field }) => (
-                                            <FormItem className="h-12">
+                                            <FormItem>
                                                 <FormControl>
                                                     <Input
                                                         placeholder="Email"
@@ -159,7 +173,7 @@ function SignUp({ label, ghost = false }: SignUpProps) {
                                         control={form.control}
                                         name="password"
                                         render={({ field }) => (
-                                            <FormItem className="h-12">
+                                            <FormItem>
                                                 <FormControl>
                                                     <div className="relative  mx-auto">
                                                         <Input
@@ -316,6 +330,24 @@ function SignUp({ label, ghost = false }: SignUpProps) {
                         </Button>
                     </form>
                 </Form>
+
+                <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
+                    By joining, you agree to our
+                    <Link
+                        href=""
+                        className=" flex items-center font-bold hover:text-primary"
+                    >
+                        Terms of Service{" "}
+                        <ExternalLink className="ml-1 h-3 w-3" />
+                    </Link>
+                    and
+                    <Link
+                        href=""
+                        className=" flex items-center font-bold hover:text-primary"
+                    >
+                        Privacy Policy <ExternalLink className="ml-1 h-3 w-3" />
+                    </Link>
+                </div>
             </DialogContent>
         </Dialog>
     );

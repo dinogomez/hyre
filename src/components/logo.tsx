@@ -7,14 +7,13 @@ function Logo() {
     return (
         <motion.div
             initial={{ scale: 1 }}
-            whileHover={{ scale: 1.3 }}
+            whileHover={{ scale: 1.17 }}
             transition={{
-                stiffness: 170,
                 damping: 17,
             }}
         >
             <Image
-                className="h-10 w-10"
+                className="h-12 w-12"
                 src="/horizon.svg"
                 alt="horizon-logo"
                 width={150}

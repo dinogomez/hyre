@@ -9,8 +9,8 @@ import { Toaster } from "@/components/ui/toaster";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-    title: "Horizon",
-    description: "Horizon: Human Resource Information System",
+    title: "Hyre",
+    description: "Hyre: Find Careers",
     icons: {
         icon: "/favicon.ico",
     },

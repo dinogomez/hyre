@@ -14,16 +14,16 @@ interface AuthSignProps {
 
 async function AuthSign({ user }: AuthSignProps) {
     return (
-        <div className="z-50 flex items-center space-x-12 ">
+        <div className="z-50 flex items-center ">
             <div className=" my-4 flex items-center">
-                <div className="flex flex-1 items-center justify-end ">
+                <div className="flex flex-1 items-center justify-start text-xl">
                     {user ? (
                         <div className="flex items-center space-x-4">
                             <DashboardButton />
                             <UserAvatarDropdown />
                         </div>
                     ) : (
-                        <div className="flex items-center space-x-10">
+                        <div className="flex items-center gap-4">
                             <SignIn label="Login" />
                             <SignUp label="Post a Job" />
                         </div>

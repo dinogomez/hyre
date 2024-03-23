@@ -81,9 +81,13 @@ function SignIn({ label }: SignInProps) {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <h1 className="cursor-pointer font-bold decoration-4 underline-offset-8 hover:underline hover:decoration-highlight">
-                    {label}
-                </h1>
+                <Button
+                    variant="outline"
+                    size="lg"
+                    className="text-base font-bold"
+                >
+                    Login
+                </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <>
@@ -229,9 +233,14 @@ function SignIn({ label }: SignInProps) {
                                         "Sign In"
                                     )}
                                 </Button>
-                                <div className="flex justify-center gap-x-2 text-sm text-muted-foreground">
+                                <div className="flex justify-center gap-x-1 text-sm text-muted-foreground">
                                     <div>No Account?</div>{" "}
-                                    <SignUp label="Create One" ghost={true} />
+                                    <DialogClose asChild>
+                                        <SignUp
+                                            label="Create One"
+                                            ghost={true}
+                                        />
+                                    </DialogClose>
                                 </div>
                             </div>
                         </form>
@@ -243,3 +252,9 @@ function SignIn({ label }: SignInProps) {
 }
 
 export default SignIn;
+
+{
+    /* <h1 className="cursor-pointer font-bold decoration-4 underline-offset-8 hover:underline hover:decoration-highlight">
+{label}
+</h1> */
+}
