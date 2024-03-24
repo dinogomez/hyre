@@ -1,8 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import AuthSign from "@/components/auth/auth.sign";
 import { User } from "lucia";
-import { motion } from "framer-motion";
 import Logo from "@/components/logo";
 
 interface HeaderProps {

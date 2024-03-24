@@ -1,9 +1,6 @@
-import { getUser } from "@/lib/auth";
 import React from "react";
 import SignIn from "@/components/auth/auth.signin";
 import SignUp from "@/components/auth/auth.signup";
-import { Button } from "@/components/ui/button";
-import { signOut } from "@/lib/actions/auth.actions";
 import DashboardButton from "@/components/auth/auth.dashboard-button";
 import UserAvatarDropdown from "../user/user.avatar-dropdown";
 import { User } from "lucia";

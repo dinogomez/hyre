@@ -1,6 +1,6 @@
 import { getUser } from "@/lib/auth";
-import Header from "./_components/header";
-import HeroSection from "./_components/hero-section";
+import Header from "./_components/home.header";
+import HeroSection from "./_components/home.hero-section";
 
 export default async function Home() {
     const { user } = await getUser();

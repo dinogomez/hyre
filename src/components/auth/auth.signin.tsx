@@ -6,7 +6,6 @@ import {
     Dialog,
     DialogContent,
     DialogTrigger,
-    DialogFooter,
     DialogClose,
 } from "@/components/ui/dialog";
 import { SignInSchema } from "@/lib/schema/zod/signup.schema";
@@ -86,7 +85,7 @@ function SignIn({ label }: SignInProps) {
                     size="lg"
                     className="text-base font-bold"
                 >
-                    Login
+                    {label}
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
@@ -252,9 +251,3 @@ function SignIn({ label }: SignInProps) {
 }
 
 export default SignIn;
-
-{
-    /* <h1 className="cursor-pointer font-bold decoration-4 underline-offset-8 hover:underline hover:decoration-highlight">
-{label}
-</h1> */
-}

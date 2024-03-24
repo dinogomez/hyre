@@ -8,20 +8,14 @@ import {
     DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
-    DropdownMenuShortcut,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { signOut } from "@/lib/actions/auth.actions";
 import { ChevronDown } from "lucide-react";
-import { User } from "lucia";
 import { useSession } from "../provider/session-provider";
 import { getFullName, getInitials } from "@/lib/utils";
-
-interface UserAvatarDropdownProps {
-    user: User;
-}
 
 function UserAvatarDropdown() {
     const { user } = useSession();

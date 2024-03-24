@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
-import { BriefcaseIcon, HomeIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { getUser } from "@/lib/auth";
-import DashboardHeader from "./_components/dashboard-header";
+import DashboardHeader from "./_components/dashboard.header";
 
 export const metadata: Metadata = {
     title: "Hyre",
@@ -23,26 +20,7 @@ export default async function DashboardLayout({
     return (
         <div className="flex min-h-screen w-screen flex-col ">
             <DashboardHeader user={user} />
-            <div className="md: flex  w-full flex-1 flex-col-reverse   md:flex-row">
-                <div className="h-28 w-full  border-t sm:hidden  md:h-auto md:w-28  md:border-t-0">
-                    <div className="mx-auto  flex  h-full max-w-md justify-center gap-3  md:mt-4 md:h-min md:flex-col md:justify-normal">
-                        <Link
-                            className="m-2 flex flex-col items-center justify-center space-y-1 rounded-md  px-5 font-mono text-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground md:py-3"
-                            href="/dashboard"
-                        >
-                            <HomeIcon className="h-6 w-6" />
-                            <span>Home</span>
-                        </Link>
-
-                        <Link
-                            className="m-2 flex flex-col items-center justify-center space-y-1 rounded-md  px-5 font-mono text-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground md:py-3"
-                            href="/dashboard/jobs"
-                        >
-                            <BriefcaseIcon className="h-6 w-6" />
-                            <span>Jobs</span>
-                        </Link>
-                    </div>
-                </div>
+            <div className="flex w-full flex-1 flex-col-reverse md:flex-row">
                 <div className="h-auto w-full flex-1 ">{children}</div>
             </div>
         </div>

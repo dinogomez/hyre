@@ -1,8 +1,8 @@
 "use client";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
+import { ZapIcon } from "lucide-react";
 import React from "react";
-import Image from "next/image";
 
 function HeroSection() {
     return (
@@ -81,8 +81,9 @@ function HeroSection() {
                                     damping: 17,
                                 }}
                             >
-                                <Badge className="bg-highlight hover:bg-highlight ">
-                                    Careers Curated For You!
+                                <Badge className="bg-highlight text-base hover:bg-highlight">
+                                    Simple, Easy and Fast{" "}
+                                    <ZapIcon className="ml-1 h-4 w-4 fill-yellow-500 text-yellow-300" />
                                 </Badge>
                             </motion.div>
                         </div>
