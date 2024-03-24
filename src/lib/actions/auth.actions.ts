@@ -80,7 +80,7 @@ export const signIn = async (values: z.infer<typeof SignInSchema>) => {
         };
     }
 
-    const expiresIn = values.keepLogin ? 60 * 60 * 24 * 7 : 60 * 60 * 12;
+    const expiresIn = values.keepLogin ? 10 : 10;
 
     const session = await lucia.createSession(existUser.id, {
         expiresIn: expiresIn,

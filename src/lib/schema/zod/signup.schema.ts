@@ -4,8 +4,8 @@ export const SignUpSchema = z
     .object({
         firstName: z.string().min(1, { message: "First name is required" }),
         lastName: z.string().min(1, { message: "Last name is required" }),
-        email: z.string().email({
-            message: "Email is required",
+        email: z.string().min(1, "Email is required").email({
+            message: "Invalid email address",
         }),
 
         password: z.string().min(8, {
@@ -21,8 +21,8 @@ export const SignUpSchema = z
     });
 
 export const SignInSchema = z.object({
-    email: z.string().email({
-        message: "Email is required",
+    email: z.string().min(1, "Email is required").email({
+        message: "Invalid email address",
     }),
     password: z.string().min(1, {
         message: "Password is required",

@@ -28,12 +28,13 @@ export const companyTable = pgTable("company", {
     id: text("id").primaryKey(),
     createdAt: timestamp("createdAt").default(sql`CURRENT_TIMESTAMP`),
     companyName: text("companyName"),
+    companyDesc: text("companyDesc"),
     companyEmail: text("companyEmail").unique(),
     website: text("website"),
     location: text("location"),
-    skills: text("skills").array(),
+    industry: text("industry").array(),
     companyLogo: text("companyLogo"),
-    numEmployee: integer("numEmployee"),
+    numEmployee: text("numEmployee"),
 });
 
 export const jobTable = pgTable("job", {
@@ -43,7 +44,6 @@ export const jobTable = pgTable("job", {
     desc: text("desc"),
     jobType: jobTypeEnum("jobTypeEnum"),
     workArrangement: workArrangementEnum("workArrangementEnum"),
-
     yearsExp: integer("yearsExp"),
     skills: text("skills").array(),
     userContactId: text("userContactId")

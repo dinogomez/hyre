@@ -65,6 +65,7 @@
         "react-dom": "^18.2.0",
         "react-hook-form": "^7.51.1",
         "react-resizable-panels": "^2.0.13",
+        "select-philippines-address": "^1.0.6",
         "sonner": "^1.4.3",
         "tailwind-merge": "^2.2.2",
         "tailwindcss-animate": "^1.0.7",

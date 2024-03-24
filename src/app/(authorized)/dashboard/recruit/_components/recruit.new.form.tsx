@@ -1,32 +1,77 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { Controller, useForm, SubmitHandler } from "react-hook-form";
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+
+import {
+    regions,
+    provinces,
+    cities,
+    barangays,
+} from "select-philippines-address";
+
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { Barangay, City, Province, Region } from "@/lib/types";
+import { eq } from "drizzle-orm";
 
 const FormDataSchema = z.object({
-    firstName: z.string().min(1, "First name is required"),
-    lastName: z.string().min(1, "Last name is required"),
-    email: z
+    companyName: z.string().min(1, "Company name is required"),
+    companyDesc: z.string().min(1, "Company description is required"),
+    companyEmail: z
         .string()
-        .min(1, "Email is required")
+        .min(1, "Company `Email is required")
         .email("Invalid email address"),
-    country: z.string().min(1, "Country is required"),
-    street: z.string().min(1, "Street is required"),
-    city: z.string().min(1, "City is required"),
-    state: z.string().min(1, "State is required"),
-    zip: z.string().min(1, "Zip is required"),
+    website: z.string(),
+    region: z.string().min(1, "Address is required."),
+    province: z.string().min(1, "Select a region first."),
+    city: z.string().min(1, "Select a province first."),
+    barangay: z.string(),
+    industry: z.array(z.string()),
+    logo: z.string(),
+    numEmployee: z.string().min(1, "Number of employees is required"),
 });
 type Inputs = z.infer<typeof FormDataSchema>;
 
 const steps = [
     {
         id: "Step 1",
-        name: "Personal Information",
-        fields: ["firstName", "lastName", "email"],
+        name: "Company Information",
+        fields: [
+            "companyName",
+            "companyDesc",
+            "companyEmail",
+            "website",
+            "region",
+            "province",
+            "city",
+            "barangay",
+            "industry",
+            "logo",
+            "numEmployee",
+        ],
     },
     {
         id: "Step 2",
@@ -37,31 +82,91 @@ const steps = [
 ];
 
 export default function RecruitForm() {
+    const [regionData, setRegion] = useState([]);
+    const [provinceData, setProvince] = useState([]);
+    const [cityData, setCity] = useState([]);
+    const [barangayData, setBarangay] = useState([]);
+
+    const [regionAddr, setRegionAddr] = useState("");
+    const [provinceAddr, setProvinceAddr] = useState("");
+    const [cityAddr, setCityAddr] = useState("");
+    const [barangayAddr, setBarangayAddr] = useState("");
+
     const [previousStep, setPreviousStep] = useState(0);
     const [currentStep, setCurrentStep] = useState(0);
+
+    const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>();
+    const [imageBase64, setImageBase64] = useState<string>("");
+
     const delta = currentStep - previousStep;
 
-    const {
-        register,
-        handleSubmit,
-        watch,
-        reset,
-        trigger,
-        formState: { errors },
-    } = useForm<Inputs>({
+    const region = () => {
+        regions().then((response) => {
+            setRegion(response);
+        });
+    };
+
+    const province = (e: string) => {
+        setRegionAddr(e);
+        provinces(e).then((response) => {
+            setProvince(response);
+            setProvinceAddr("");
+            setCityAddr("");
+            setBarangayAddr("");
+            setCity([]);
+            setBarangay([]);
+        });
+    };
+
+    const city = (e: string) => {
+        setProvinceAddr(e);
+        cities(e).then((response) => {
+            setCity(response);
+        });
+    };
+
+    const barangay = (e: string) => {
+        setCityAddr(e);
+        barangays(e).then((response) => {
+            setBarangay(response);
+        });
+    };
+
+    const brgy = (e: string) => {
+        setBarangayAddr(e);
+    };
+
+    useEffect(() => {
+        region();
+    }, []);
+
+    const form = useForm<z.infer<typeof FormDataSchema>>({
         resolver: zodResolver(FormDataSchema),
+        defaultValues: {
+            companyName: "",
+            companyDesc: "",
+            companyEmail: "",
+            website: "",
+            region: "",
+            province: "",
+            city: "",
+            barangay: "",
+            industry: [],
+            logo: "",
+            numEmployee: "",
+        },
     });
 
     const processForm: SubmitHandler<Inputs> = (data) => {
         console.log(data);
-        reset();
+        form.reset();
     };
 
     type FieldName = keyof Inputs;
 
     const next = async () => {
         const fields = steps[currentStep].fields;
-        const output = await trigger(fields as FieldName[], {
+        const output = await form.trigger(fields as FieldName[], {
             shouldFocus: true,
         });
 
@@ -69,7 +174,7 @@ export default function RecruitForm() {
 
         if (currentStep < steps.length - 1) {
             if (currentStep === steps.length - 2) {
-                await handleSubmit(processForm)();
+                await form.handleSubmit(processForm)();
             }
             setPreviousStep(currentStep);
             setCurrentStep((step) => step + 1);
@@ -80,6 +185,18 @@ export default function RecruitForm() {
         if (currentStep > 0) {
             setPreviousStep(currentStep);
             setCurrentStep((step) => step - 1);
+        }
+    };
+
+    const handleImageChange = (file: FileList | null) => {
+        if (file?.[0]) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const base64String = reader.result as string;
+                setImageBase64(base64String);
+                setImagePreviewUrl(reader.result as string);
+            };
+            reader.readAsDataURL(file[0]);
         }
     };
 
@@ -130,239 +247,418 @@ export default function RecruitForm() {
             </nav>
 
             {/* Form */}
-            <form className="mt-12 py-12" onSubmit={handleSubmit(processForm)}>
-                {currentStep === 0 && (
-                    <motion.div
-                        initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ duration: 0.3, ease: "easeInOut" }}
-                    >
-                        <h2 className="text-base font-semibold leading-7 text-gray-900">
-                            Personal Information
-                        </h2>
-                        <p className="mt-1 text-sm leading-6 text-gray-600">
-                            Provide your personal details.
-                        </p>
-                        <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                            <div className="sm:col-span-3">
-                                <label
-                                    htmlFor="firstName"
-                                    className="block text-sm font-medium leading-6 text-gray-900"
-                                >
-                                    First name
-                                </label>
-                                <div className="mt-2">
-                                    <input
-                                        type="text"
-                                        id="firstName"
-                                        {...register("firstName")}
-                                        autoComplete="given-name"
-                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
+            <Form {...form}>
+                <form
+                    className="mt-12 py-12"
+                    onSubmit={form.handleSubmit(processForm)}
+                >
+                    {currentStep === 0 && (
+                        <motion.div
+                            initial={{
+                                x: delta >= 0 ? "50%" : "-50%",
+                                opacity: 0,
+                            }}
+                            animate={{ x: 0, opacity: 1 }}
+                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                            className="mx-auto w-7/12"
+                        >
+                            <div className="flex items-end justify-between">
+                                <div className="flex flex-col">
+                                    <h2 className="text-base font-semibold leading-7 text-gray-900">
+                                        About your company
+                                    </h2>
+                                    <p className="mt-1 text-sm leading-6 text-gray-600">
+                                        Provide your company details.
+                                    </p>
+                                </div>
+                                <Image
+                                    src={imagePreviewUrl ?? "/200x200.svg"}
+                                    className="h-32 w-32 rounded-md border border-input bg-background p-1"
+                                    width={128}
+                                    height={128}
+                                    alt="Logo"
+                                />
+                            </div>
+
+                            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                                <div className="sm:col-span-3">
+                                    <FormField
+                                        control={form.control}
+                                        name="companyName"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel required={true}>
+                                                    Company Name
+                                                </FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="text"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormDescription>
+                                                    This is your public company
+                                                    name.
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
                                     />
-                                    {errors.firstName?.message && (
-                                        <p className="mt-2 text-sm text-red-400">
-                                            {errors.firstName.message}
-                                        </p>
-                                    )}
                                 </div>
-                            </div>
+                                <div className="sm:col-span-3">
+                                    <Controller
+                                        control={form.control}
+                                        name="logo"
+                                        render={({
+                                            field: { onChange, ...field },
+                                        }) => (
+                                            <FormItem>
+                                                <FormLabel>
+                                                    Company Logo
+                                                </FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="file"
+                                                        accept=".png,.jpg,.jpeg"
+                                                        {...field}
+                                                        className="w-full rounded-md border p-2"
+                                                        onChange={(e) => {
+                                                            handleImageChange(
+                                                                e.target.files
+                                                            );
+                                                            onChange(e);
+                                                        }}
+                                                    />
+                                                </FormControl>
 
-                            <div className="sm:col-span-3">
-                                <label
-                                    htmlFor="lastName"
-                                    className="block text-sm font-medium leading-6 text-gray-900"
-                                >
-                                    Last name
-                                </label>
-                                <div className="mt-2">
-                                    <input
-                                        type="text"
-                                        id="lastName"
-                                        {...register("lastName")}
-                                        autoComplete="family-name"
-                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
+                                                <FormDescription className="">
+                                                    Images up to 2MB{" "}
+                                                    {"(PNG, JPG, JPEG)"}
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
                                     />
-                                    {errors.lastName?.message && (
-                                        <p className="mt-2 text-sm text-red-400">
-                                            {errors.lastName.message}
-                                        </p>
-                                    )}
                                 </div>
-                            </div>
 
-                            <div className="sm:col-span-4">
-                                <label
-                                    htmlFor="email"
-                                    className="block text-sm font-medium leading-6 text-gray-900"
-                                >
-                                    Email address
-                                </label>
-                                <div className="mt-2">
-                                    <input
-                                        id="email"
-                                        type="email"
-                                        {...register("email")}
-                                        autoComplete="email"
-                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
+                                <div className="sm:col-span-6">
+                                    <FormField
+                                        control={form.control}
+                                        name="companyDesc"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>
+                                                    Company Description
+                                                </FormLabel>
+                                                <FormControl>
+                                                    <Input {...field} />
+                                                </FormControl>
+                                                <FormDescription>
+                                                    What is your company about?
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
                                     />
-                                    {errors.email?.message && (
-                                        <p className="mt-2 text-sm text-red-400">
-                                            {errors.email.message}
-                                        </p>
-                                    )}
                                 </div>
-                            </div>
-                        </div>
-                    </motion.div>
-                )}
 
-                {currentStep === 1 && (
-                    <motion.div
-                        initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ duration: 0.3, ease: "easeInOut" }}
-                    >
-                        <h2 className="text-base font-semibold leading-7 text-gray-900">
-                            Address
-                        </h2>
-                        <p className="mt-1 text-sm leading-6 text-gray-600">
-                            Address where you can receive mail.
-                        </p>
+                                <div className="sm:col-span-3">
+                                    <FormField
+                                        control={form.control}
+                                        name="companyEmail"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel required={true}>
+                                                    Company Email
+                                                </FormLabel>
+                                                <FormControl>
+                                                    <Input {...field} />
+                                                </FormControl>
 
-                        <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                            <div className="sm:col-span-3">
-                                <label
-                                    htmlFor="country"
-                                    className="block text-sm font-medium leading-6 text-gray-900"
-                                >
-                                    Country
-                                </label>
-                                <div className="mt-2">
-                                    <select
-                                        id="country"
-                                        {...register("country")}
-                                        autoComplete="country-name"
-                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                                    >
-                                        <option>United States</option>
-                                        <option>Canada</option>
-                                        <option>Mexico</option>
-                                    </select>
-                                    {errors.country?.message && (
-                                        <p className="mt-2 text-sm text-red-400">
-                                            {errors.country.message}
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="col-span-full">
-                                <label
-                                    htmlFor="street"
-                                    className="block text-sm font-medium leading-6 text-gray-900"
-                                >
-                                    Street address
-                                </label>
-                                <div className="mt-2">
-                                    <input
-                                        type="text"
-                                        id="street"
-                                        {...register("street")}
-                                        autoComplete="street-address"
-                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
                                     />
-                                    {errors.street?.message && (
-                                        <p className="mt-2 text-sm text-red-400">
-                                            {errors.street.message}
-                                        </p>
-                                    )}
                                 </div>
-                            </div>
 
-                            <div className="sm:col-span-2 sm:col-start-1">
-                                <label
-                                    htmlFor="city"
-                                    className="block text-sm font-medium leading-6 text-gray-900"
-                                >
-                                    City
-                                </label>
-                                <div className="mt-2">
-                                    <input
-                                        type="text"
-                                        id="city"
-                                        {...register("city")}
-                                        autoComplete="address-level2"
-                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
+                                <div className="sm:col-span-3">
+                                    <FormField
+                                        control={form.control}
+                                        name="website"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Website</FormLabel>
+                                                <FormControl>
+                                                    <Input {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
                                     />
-                                    {errors.city?.message && (
-                                        <p className="mt-2 text-sm text-red-400">
-                                            {errors.city.message}
-                                        </p>
-                                    )}
                                 </div>
-                            </div>
-
-                            <div className="sm:col-span-2">
-                                <label
-                                    htmlFor="state"
-                                    className="block text-sm font-medium leading-6 text-gray-900"
-                                >
-                                    State / Province
-                                </label>
-                                <div className="mt-2">
-                                    <input
-                                        type="text"
-                                        id="state"
-                                        {...register("state")}
-                                        autoComplete="address-level1"
-                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
+                                <div className="sm:col-span-3">
+                                    <FormField
+                                        control={form.control}
+                                        name="region"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel required={true}>
+                                                    Region
+                                                </FormLabel>
+                                                <Select
+                                                    onValueChange={(value) => {
+                                                        field.onChange(value);
+                                                        region();
+                                                        province(value);
+                                                    }}
+                                                    defaultValue={field.value}
+                                                >
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select a Region" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {regionData &&
+                                                            regionData.length >
+                                                                0 &&
+                                                            regionData.map(
+                                                                (
+                                                                    item: Region
+                                                                ) => (
+                                                                    <SelectItem
+                                                                        key={
+                                                                            item.region_code
+                                                                        }
+                                                                        value={
+                                                                            item.region_code
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            item.region_name
+                                                                        }
+                                                                    </SelectItem>
+                                                                )
+                                                            )}
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormDescription>
+                                                    Select your region.
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
                                     />
-                                    {errors.state?.message && (
-                                        <p className="mt-2 text-sm text-red-400">
-                                            {errors.state.message}
-                                        </p>
-                                    )}
                                 </div>
-                            </div>
-
-                            <div className="sm:col-span-2">
-                                <label
-                                    htmlFor="zip"
-                                    className="block text-sm font-medium leading-6 text-gray-900"
-                                >
-                                    ZIP / Postal code
-                                </label>
-                                <div className="mt-2">
-                                    <input
-                                        type="text"
-                                        id="zip"
-                                        {...register("zip")}
-                                        autoComplete="postal-code"
-                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
+                                <div className="sm:col-span-3">
+                                    <FormField
+                                        control={form.control}
+                                        name="province"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel required={true}>
+                                                    Province
+                                                </FormLabel>
+                                                <Select
+                                                    onValueChange={(value) => {
+                                                        field.onChange(value);
+                                                        city(value);
+                                                    }}
+                                                    defaultValue={field.value}
+                                                    disabled={!regionAddr}
+                                                >
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select a Province" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {provinceData &&
+                                                            provinceData.length >
+                                                                0 &&
+                                                            provinceData.map(
+                                                                (
+                                                                    item: Province
+                                                                ) => (
+                                                                    <SelectItem
+                                                                        key={
+                                                                            item.province_code
+                                                                        }
+                                                                        value={
+                                                                            item.province_code
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            item.province_name
+                                                                        }
+                                                                    </SelectItem>
+                                                                )
+                                                            )}
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormDescription>
+                                                    Select your province.
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
                                     />
-                                    {errors.zip?.message && (
-                                        <p className="mt-2 text-sm text-red-400">
-                                            {errors.zip.message}
-                                        </p>
-                                    )}
+                                </div>
+                                <div className="sm:col-span-3">
+                                    <FormField
+                                        control={form.control}
+                                        name="city"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel required={true}>
+                                                    City
+                                                </FormLabel>
+                                                <Select
+                                                    onValueChange={(value) => {
+                                                        field.onChange(value);
+                                                        barangay(value);
+                                                    }}
+                                                    defaultValue={field.value}
+                                                    disabled={!provinceAddr}
+                                                >
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select a city" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {cityData &&
+                                                            cityData.length >
+                                                                0 &&
+                                                            cityData.map(
+                                                                (
+                                                                    item: City
+                                                                ) => (
+                                                                    <SelectItem
+                                                                        key={
+                                                                            item.city_code
+                                                                        }
+                                                                        value={
+                                                                            item.city_code
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            item.city_name
+                                                                        }
+                                                                    </SelectItem>
+                                                                )
+                                                            )}
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormDescription>
+                                                    Select your city.
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+
+                                <div className="sm:col-span-3">
+                                    <FormField
+                                        control={form.control}
+                                        name="barangay"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel optional={true}>
+                                                    Barangay
+                                                </FormLabel>
+                                                <Select
+                                                    onValueChange={(value) => {
+                                                        field.onChange(value);
+                                                        brgy(value);
+                                                    }}
+                                                    defaultValue={field.value}
+                                                    disabled={!cityAddr}
+                                                >
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select a Barangay" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {barangayData &&
+                                                            barangayData.length >
+                                                                0 &&
+                                                            barangayData.map(
+                                                                (
+                                                                    item: Barangay
+                                                                ) => (
+                                                                    <SelectItem
+                                                                        key={
+                                                                            item.brgy_code
+                                                                        }
+                                                                        value={
+                                                                            item.brgy_code
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            item.brgy_name
+                                                                        }
+                                                                    </SelectItem>
+                                                                )
+                                                            )}
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormDescription>
+                                                    Select your barangay.
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
                                 </div>
                             </div>
-                        </div>
-                    </motion.div>
-                )}
+                        </motion.div>
+                    )}
 
-                {currentStep === 2 && (
-                    <>
-                        <h2 className="text-base font-semibold leading-7 text-gray-900">
-                            Complete
-                        </h2>
-                        <p className="mt-1 text-sm leading-6 text-gray-600">
-                            Thank you for your submission.
-                        </p>
-                    </>
-                )}
-            </form>
+                    {currentStep === 1 && (
+                        <motion.div
+                            initial={{
+                                x: delta >= 0 ? "50%" : "-50%",
+                                opacity: 0,
+                            }}
+                            animate={{ x: 0, opacity: 1 }}
+                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                        >
+                            <h2 className="text-base font-semibold leading-7 text-gray-900">
+                                Address
+                            </h2>
+                            <p className="mt-1 text-sm leading-6 text-gray-600">
+                                Address where you can receive mail.
+                            </p>
 
+                            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                                <div className="sm:col-span-3"></div>
+
+                                <div className="col-span-full"></div>
+
+                                <div className="sm:col-span-2 sm:col-start-1"></div>
+
+                                <div className="sm:col-span-2"></div>
+
+                                <div className="sm:col-span-2"></div>
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {currentStep === 2 && (
+                        <>
+                            <h2 className="text-base font-semibold leading-7 text-gray-900">
+                                Complete
+                            </h2>
+                            <p className="mt-1 text-sm leading-6 text-gray-600">
+                                Thank you for your submission.
+                            </p>
+                        </>
+                    )}
+                </form>
+            </Form>
             {/* Navigation */}
             <div className="mt-8 pt-5">
                 <div className="flex justify-between">

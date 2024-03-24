@@ -13,6 +13,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { AlertCircleIcon } from "lucide-react";
+import { Span } from "next/dist/trace";
 
 const Form = FormProvider;
 
@@ -84,20 +85,29 @@ const FormItem = React.forwardRef<
     );
 });
 FormItem.displayName = "FormItem";
-
 const FormLabel = React.forwardRef<
     React.ElementRef<typeof LabelPrimitive.Root>,
-    React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
->(({ className, ...props }, ref) => {
+    React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & {
+        required?: boolean;
+        optional?: boolean;
+    }
+>(({ className, required = false, optional = false, ...props }, ref) => {
     const { error, formItemId } = useFormField();
-
     return (
-        <Label
-            ref={ref}
-            className={cn(error && className)}
-            htmlFor={formItemId}
-            {...props}
-        />
+        <span>
+            <Label
+                ref={ref}
+                className={cn(error && className)}
+                htmlFor={formItemId}
+                {...props}
+            />
+            {required && <span className="ml-1 font-bold text-red-500">*</span>}
+            {optional && (
+                <span className="ml-1 text-xs text-muted-foreground">
+                    {"( optional )"}
+                </span>
+            )}
+        </span>
     );
 });
 FormLabel.displayName = "FormLabel";
