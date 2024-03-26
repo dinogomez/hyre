@@ -93,7 +93,7 @@ function SignIn({ label }: SignInProps) {
                     <DialogHeader className="mb-6">
                         <DialogTitle>Login</DialogTitle>
                         <DialogDescription>
-                            Search your horizon!
+                            Build your career with Hyze!
                         </DialogDescription>
                     </DialogHeader>
                     <Form {...form}>

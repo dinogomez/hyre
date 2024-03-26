@@ -95,7 +95,7 @@ export const signIn = async (values: z.infer<typeof SignInSchema>) => {
     );
 
     return {
-        success: "Launching Horizon!",
+        success: "Signing In!",
     };
 };
 
