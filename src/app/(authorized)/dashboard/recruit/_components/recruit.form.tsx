@@ -36,21 +36,28 @@ import {
 } from "@/components/ui/select";
 import { Barangay, City, Province, Region } from "@/lib/types";
 import { eq } from "drizzle-orm";
+import { numberOfEmployee } from "@/lib/data/data.number-employees";
+import { Tag, TagInput } from "@/components/ui/tag/tag-input";
+import { Markets } from "@/lib/data/data.markets";
 
 const FormDataSchema = z.object({
     companyName: z.string().min(1, "Company name is required"),
     companyDesc: z.string().min(1, "Company description is required"),
     companyEmail: z
         .string()
-        .min(1, "Company `Email is required")
+        .min(1, "Company Email is required")
         .email("Invalid email address"),
     website: z.string(),
     region: z.string().min(1, "Address is required."),
     province: z.string().min(1, "Select a region first."),
     city: z.string().min(1, "Select a province first."),
     barangay: z.string(),
-    industry: z.array(z.string()),
-    logo: z.string(),
+    industry: z
+        .array(z.string())
+        .refine((value) => value.some((item) => item), {
+            message: "You have to select at least one industry.",
+        }),
+    logo: z.string().min(1, "Logo is required"),
     numEmployee: z.string().min(1, "Number of employees is required"),
 });
 type Inputs = z.infer<typeof FormDataSchema>;
@@ -62,20 +69,20 @@ const steps = [
         fields: [
             "companyName",
             "companyDesc",
+            "industry",
             "companyEmail",
             "website",
             "region",
             "province",
             "city",
             "barangay",
-            "industry",
             "logo",
             "numEmployee",
         ],
     },
     {
         id: "Step 2",
-        name: "Address",
+        name: "Jobs",
         fields: ["country", "state", "city", "street", "zip"],
     },
     { id: "Step 3", name: "Complete" },
@@ -97,6 +104,7 @@ export default function RecruitForm() {
 
     const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>();
     const [imageBase64, setImageBase64] = useState<string>("");
+    const [autocompleteTags, setAutocompleteTags] = useState<Tag[]>([]);
 
     const delta = currentStep - previousStep;
 
@@ -142,6 +150,7 @@ export default function RecruitForm() {
 
     const form = useForm<z.infer<typeof FormDataSchema>>({
         resolver: zodResolver(FormDataSchema),
+        mode: "onChange",
         defaultValues: {
             companyName: "",
             companyDesc: "",
@@ -157,6 +166,15 @@ export default function RecruitForm() {
         },
     });
 
+    form.register("industry", {
+        value: autocompleteTags.map((tag) => tag.text),
+    });
+    useEffect(() => {
+        const industryValues = autocompleteTags.map((tag) => tag.text);
+        form.setValue("industry", industryValues);
+        form.trigger("industry");
+    }, [autocompleteTags, form]);
+
     const processForm: SubmitHandler<Inputs> = (data) => {
         console.log(data);
         form.reset();
@@ -169,6 +187,8 @@ export default function RecruitForm() {
         const output = await form.trigger(fields as FieldName[], {
             shouldFocus: true,
         });
+
+        console.log(form.getValues());
 
         if (!output) return;
 
@@ -188,6 +208,20 @@ export default function RecruitForm() {
         }
     };
 
+    form.register("logo", {
+        validate: (value: any) => {
+            if (!value) {
+                return "Please upload a company logo.";
+            }
+            const isValidImage =
+                value instanceof File && /\.(png|jpg|jpeg)$/i.test(value.name);
+            if (!isValidImage) {
+                return "Please upload a valid image file (PNG, JPG, JPEG).";
+            }
+            return true;
+        },
+    });
+
     const handleImageChange = (file: FileList | null) => {
         if (file?.[0]) {
             const reader = new FileReader();
@@ -196,6 +230,7 @@ export default function RecruitForm() {
                 setImageBase64(base64String);
                 setImagePreviewUrl(reader.result as string);
             };
+            form.setValue("logo", imageBase64);
             reader.readAsDataURL(file[0]);
         }
     };
@@ -211,8 +246,8 @@ export default function RecruitForm() {
                     {steps.map((step, index) => (
                         <li key={step.name} className="md:flex-1">
                             {currentStep > index ? (
-                                <div className="group flex w-full flex-col border-l-4 border-sky-600 py-2 pl-4 transition-colors md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4">
-                                    <span className="text-sm font-medium text-sky-600 transition-colors ">
+                                <div className="group flex w-full flex-col border-l-4 border-highlight py-2 pl-4 transition-colors md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4">
+                                    <span className="text-sm font-medium text-highlight transition-colors ">
                                         {step.id}
                                     </span>
                                     <span className="text-sm font-medium">
@@ -221,10 +256,10 @@ export default function RecruitForm() {
                                 </div>
                             ) : currentStep === index ? (
                                 <div
-                                    className="flex w-full flex-col border-l-4 border-sky-600 py-2 pl-4 md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4"
+                                    className="flex w-full flex-col border-l-4 border-highlight py-2 pl-4 md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4"
                                     aria-current="step"
                                 >
-                                    <span className="text-sm font-medium text-sky-600">
+                                    <span className="text-sm font-medium text-highlight">
                                         {step.id}
                                     </span>
                                     <span className="text-sm font-medium">
@@ -233,7 +268,7 @@ export default function RecruitForm() {
                                 </div>
                             ) : (
                                 <div className="group flex w-full flex-col border-l-4 border-gray-200 py-2 pl-4 transition-colors md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4">
-                                    <span className="text-sm font-medium text-gray-500 transition-colors">
+                                    <span className="text-sm font-medium text-muted-foreground transition-colors">
                                         {step.id}
                                     </span>
                                     <span className="text-sm font-medium">
@@ -249,7 +284,7 @@ export default function RecruitForm() {
             {/* Form */}
             <Form {...form}>
                 <form
-                    className="mt-12 py-12"
+                    className="mt-5 py-12"
                     onSubmit={form.handleSubmit(processForm)}
                 >
                     {currentStep === 0 && (
@@ -260,7 +295,7 @@ export default function RecruitForm() {
                             }}
                             animate={{ x: 0, opacity: 1 }}
                             transition={{ duration: 0.3, ease: "easeInOut" }}
-                            className="mx-auto w-7/12"
+                            className="mx-auto w-8/12"
                         >
                             <div className="flex items-end justify-between">
                                 <div className="flex flex-col">
@@ -292,6 +327,7 @@ export default function RecruitForm() {
                                                 </FormLabel>
                                                 <FormControl>
                                                     <Input
+                                                        placeholder="Company Name"
                                                         type="text"
                                                         {...field}
                                                     />
@@ -313,7 +349,7 @@ export default function RecruitForm() {
                                             field: { onChange, ...field },
                                         }) => (
                                             <FormItem>
-                                                <FormLabel>
+                                                <FormLabel required={true}>
                                                     Company Logo
                                                 </FormLabel>
                                                 <FormControl>
@@ -328,6 +364,7 @@ export default function RecruitForm() {
                                                             );
                                                             onChange(e);
                                                         }}
+                                                        value={undefined}
                                                     />
                                                 </FormControl>
 
@@ -351,10 +388,55 @@ export default function RecruitForm() {
                                                     Company Description
                                                 </FormLabel>
                                                 <FormControl>
-                                                    <Input {...field} />
+                                                    <Input
+                                                        placeholder="Describe your company"
+                                                        {...field}
+                                                    />
                                                 </FormControl>
                                                 <FormDescription>
                                                     What is your company about?
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+
+                                <div className="sm:col-span-6">
+                                    <FormField
+                                        control={form.control}
+                                        name="industry"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Industry</FormLabel>
+                                                <FormControl>
+                                                    <div className="w-full">
+                                                        <TagInput
+                                                            {...field}
+                                                            placeholder="Search for industries."
+                                                            tags={
+                                                                autocompleteTags
+                                                            }
+                                                            enableAutocomplete
+                                                            maxTags={3}
+                                                            restrictTagsToAutocompleteOptions
+                                                            autocompleteOptions={
+                                                                Markets
+                                                            }
+                                                            className="sm:min-w-[450px]"
+                                                            setTags={(
+                                                                newTags
+                                                            ) => {
+                                                                setAutocompleteTags(
+                                                                    newTags
+                                                                );
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </FormControl>
+                                                <FormDescription>
+                                                    What is Industries is the
+                                                    company in?
                                                 </FormDescription>
                                                 <FormMessage />
                                             </FormItem>
@@ -372,7 +454,10 @@ export default function RecruitForm() {
                                                     Company Email
                                                 </FormLabel>
                                                 <FormControl>
-                                                    <Input {...field} />
+                                                    <Input
+                                                        placeholder="Company@email.com"
+                                                        {...field}
+                                                    />
                                                 </FormControl>
 
                                                 <FormMessage />
@@ -389,7 +474,10 @@ export default function RecruitForm() {
                                             <FormItem>
                                                 <FormLabel>Website</FormLabel>
                                                 <FormControl>
-                                                    <Input {...field} />
+                                                    <Input
+                                                        placeholder="Company.com"
+                                                        {...field}
+                                                    />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -607,6 +695,57 @@ export default function RecruitForm() {
                                                 </Select>
                                                 <FormDescription>
                                                     Select your barangay.
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+
+                                <div className="sm:col-span-6">
+                                    <FormField
+                                        control={form.control}
+                                        name="numEmployee"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel required={true}>
+                                                    Number of Employees
+                                                </FormLabel>
+                                                <Select
+                                                    onValueChange={
+                                                        field.onChange
+                                                    }
+                                                    defaultValue={field.value}
+                                                >
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select the number of employees" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {numberOfEmployee &&
+                                                            numberOfEmployee.length >
+                                                                0 &&
+                                                            numberOfEmployee.map(
+                                                                (item) => (
+                                                                    <SelectItem
+                                                                        key={
+                                                                            item.id
+                                                                        }
+                                                                        value={
+                                                                            item.id
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            item.label
+                                                                        }
+                                                                    </SelectItem>
+                                                                )
+                                                            )}
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormDescription>
+                                                    How big is the company?
                                                 </FormDescription>
                                                 <FormMessage />
                                             </FormItem>

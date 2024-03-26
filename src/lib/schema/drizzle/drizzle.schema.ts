@@ -31,7 +31,11 @@ export const companyTable = pgTable("company", {
     companyDesc: text("companyDesc"),
     companyEmail: text("companyEmail").unique(),
     website: text("website"),
-    location: text("location"),
+    region: text("location"),
+    province: text("location"),
+    city: text("location"),
+    barangay: text("location"),
+
     industry: text("industry").array(),
     companyLogo: text("companyLogo"),
     numEmployee: text("numEmployee"),

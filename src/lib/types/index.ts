@@ -3,6 +3,11 @@ export interface iObject {
     label: string;
 }
 
+export interface iMarket {
+    id: string;
+    text: string;
+}
+
 export interface Region {
     id: number;
     psgc_code: string;
