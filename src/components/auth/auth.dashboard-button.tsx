@@ -9,7 +9,9 @@ function DashboardButton() {
         <div>
             {pathname === "/" && (
                 <Link href="/dashboard">
-                    <Button variant="outline">Dashboard</Button>
+                    <Button variant="outline" size="lg" className="text-lg">
+                        Dashboard
+                    </Button>
                 </Link>
             )}
         </div>

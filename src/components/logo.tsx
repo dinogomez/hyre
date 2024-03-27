@@ -13,6 +13,7 @@ function Logo() {
             }}
         >
             <Image
+                priority
                 className="h-12 w-12"
                 src="/horizon.svg"
                 alt="horizon-logo"

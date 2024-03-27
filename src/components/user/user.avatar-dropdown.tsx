@@ -29,9 +29,11 @@ function UserAvatarDropdown() {
                     className="relative focus-visible:ring-0 focus-visible:ring-offset-0"
                 >
                     <div className="justify-content flex items-center gap-2 ring-0">
-                        <Avatar className="h-10 w-10">
+                        <Avatar className="h-12 w-12">
                             <AvatarImage src="/avatars/01.png" alt="@shadcn" />
-                            <AvatarFallback>{initials}</AvatarFallback>
+                            <AvatarFallback className="bg-primary text-white">
+                                {initials}
+                            </AvatarFallback>
                         </Avatar>
                         <ChevronDown className="h-6 w-6" />
                     </div>

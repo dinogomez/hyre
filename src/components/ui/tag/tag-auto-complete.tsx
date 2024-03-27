@@ -41,14 +41,43 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({
     onBlur,
 }) => {
     const [inputFocused, setInputFocused] = React.useState(false);
+    const commandRef = React.useRef<HTMLDivElement>(null);
+
+    React.useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                commandRef.current &&
+                !commandRef.current.contains(event.target as Node)
+            ) {
+                setInputFocused(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+    const handleCommandBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+        if (
+            event.relatedTarget &&
+            commandRef.current?.contains(event.relatedTarget as Node)
+        ) {
+            return;
+        }
+        onBlur?.(event);
+    };
 
     return (
         <Command
+            ref={commandRef}
             className={`mt-1 border ${
                 maxTags !== undefined && tags.length >= maxTags ? "hidden" : ""
             }`}
             onFocus={() => setInputFocused(true)}
-            onBlur={(e) => e.relatedTarget === null && setInputFocused(false)}
+            onBlur={handleCommandBlur}
         >
             <CommandList>
                 <CommandInput

@@ -39,28 +39,9 @@ import { eq } from "drizzle-orm";
 import { numberOfEmployee } from "@/lib/data/data.number-employees";
 import { Tag, TagInput } from "@/components/ui/tag/tag-input";
 import { Markets } from "@/lib/data/data.markets";
+import { CompanySchema } from "@/lib/schema/zod/company.schema";
 
-const FormDataSchema = z.object({
-    companyName: z.string().min(1, "Company name is required"),
-    companyDesc: z.string().min(1, "Company description is required"),
-    companyEmail: z
-        .string()
-        .min(1, "Company Email is required")
-        .email("Invalid email address"),
-    website: z.string(),
-    region: z.string().min(1, "Address is required."),
-    province: z.string().min(1, "Select a region first."),
-    city: z.string().min(1, "Select a province first."),
-    barangay: z.string(),
-    industry: z
-        .array(z.string())
-        .refine((value) => value.some((item) => item), {
-            message: "You have to select at least one industry.",
-        }),
-    logo: z.string().min(1, "Logo is required"),
-    numEmployee: z.string().min(1, "Number of employees is required"),
-});
-type Inputs = z.infer<typeof FormDataSchema>;
+type Inputs = z.infer<typeof CompanySchema>;
 
 const steps = [
     {
@@ -68,6 +49,7 @@ const steps = [
         name: "Company Information",
         fields: [
             "companyName",
+            "logo",
             "companyDesc",
             "industry",
             "companyEmail",
@@ -76,7 +58,6 @@ const steps = [
             "province",
             "city",
             "barangay",
-            "logo",
             "numEmployee",
         ],
     },
@@ -148,8 +129,8 @@ export default function RecruitForm() {
         region();
     }, []);
 
-    const form = useForm<z.infer<typeof FormDataSchema>>({
-        resolver: zodResolver(FormDataSchema),
+    const form = useForm<z.infer<typeof CompanySchema>>({
+        resolver: zodResolver(CompanySchema),
         mode: "onChange",
         defaultValues: {
             companyName: "",
@@ -161,7 +142,6 @@ export default function RecruitForm() {
             city: "",
             barangay: "",
             industry: [],
-            logo: "",
             numEmployee: "",
         },
     });
@@ -169,10 +149,13 @@ export default function RecruitForm() {
     form.register("industry", {
         value: autocompleteTags.map((tag) => tag.text),
     });
+
     useEffect(() => {
         const industryValues = autocompleteTags.map((tag) => tag.text);
         form.setValue("industry", industryValues);
-        form.trigger("industry");
+        if (autocompleteTags.length > 0) {
+            form.trigger("industry");
+        }
     }, [autocompleteTags, form]);
 
     const processForm: SubmitHandler<Inputs> = (data) => {
@@ -208,20 +191,6 @@ export default function RecruitForm() {
         }
     };
 
-    form.register("logo", {
-        validate: (value: any) => {
-            if (!value) {
-                return "Please upload a company logo.";
-            }
-            const isValidImage =
-                value instanceof File && /\.(png|jpg|jpeg)$/i.test(value.name);
-            if (!isValidImage) {
-                return "Please upload a valid image file (PNG, JPG, JPEG).";
-            }
-            return true;
-        },
-    });
-
     const handleImageChange = (file: FileList | null) => {
         if (file?.[0]) {
             const reader = new FileReader();
@@ -230,7 +199,6 @@ export default function RecruitForm() {
                 setImageBase64(base64String);
                 setImagePreviewUrl(reader.result as string);
             };
-            form.setValue("logo", imageBase64);
             reader.readAsDataURL(file[0]);
         }
     };
@@ -307,6 +275,7 @@ export default function RecruitForm() {
                                     </p>
                                 </div>
                                 <Image
+                                    priority
                                     src={imagePreviewUrl ?? "/200x200.svg"}
                                     className="h-32 w-32 rounded-md border border-input bg-background p-1"
                                     width={128}
@@ -342,11 +311,15 @@ export default function RecruitForm() {
                                     />
                                 </div>
                                 <div className="sm:col-span-3">
-                                    <Controller
+                                    <FormField
                                         control={form.control}
                                         name="logo"
                                         render={({
-                                            field: { onChange, ...field },
+                                            field: {
+                                                value,
+                                                onChange,
+                                                ...fieldProps
+                                            },
                                         }) => (
                                             <FormItem>
                                                 <FormLabel required={true}>
@@ -354,22 +327,26 @@ export default function RecruitForm() {
                                                 </FormLabel>
                                                 <FormControl>
                                                     <Input
+                                                        {...fieldProps}
+                                                        placeholder="logo"
                                                         type="file"
-                                                        accept=".png,.jpg,.jpeg"
-                                                        {...field}
-                                                        className="w-full rounded-md border p-2"
-                                                        onChange={(e) => {
+                                                        accept="image/jpeg, image/jpg,image/png,"
+                                                        onChange={(event) => {
                                                             handleImageChange(
-                                                                e.target.files
+                                                                event.target
+                                                                    .files
                                                             );
-                                                            onChange(e);
+                                                            onChange(
+                                                                event.target
+                                                                    .files &&
+                                                                    event.target
+                                                                        .files[0]
+                                                            );
                                                         }}
-                                                        value={undefined}
                                                     />
                                                 </FormControl>
-
                                                 <FormDescription className="">
-                                                    Images up to 2MB{" "}
+                                                    Images up to 5MB{" "}
                                                     {"(PNG, JPG, JPEG)"}
                                                 </FormDescription>
                                                 <FormMessage />
@@ -384,7 +361,7 @@ export default function RecruitForm() {
                                         name="companyDesc"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>
+                                                <FormLabel required={true}>
                                                     Company Description
                                                 </FormLabel>
                                                 <FormControl>
@@ -408,7 +385,9 @@ export default function RecruitForm() {
                                         name="industry"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Industry</FormLabel>
+                                                <FormLabel required={true}>
+                                                    Industry
+                                                </FormLabel>
                                                 <FormControl>
                                                     <div className="w-full">
                                                         <TagInput
@@ -418,8 +397,7 @@ export default function RecruitForm() {
                                                                 autocompleteTags
                                                             }
                                                             enableAutocomplete
-                                                            maxTags={3}
-                                                            restrictTagsToAutocompleteOptions
+                                                            maxTags={5}
                                                             autocompleteOptions={
                                                                 Markets
                                                             }
@@ -435,8 +413,8 @@ export default function RecruitForm() {
                                                     </div>
                                                 </FormControl>
                                                 <FormDescription>
-                                                    What is Industries is the
-                                                    company in?
+                                                    What industries is the
+                                                    company in? Maximum of 5.
                                                 </FormDescription>
                                                 <FormMessage />
                                             </FormItem>
@@ -455,7 +433,7 @@ export default function RecruitForm() {
                                                 </FormLabel>
                                                 <FormControl>
                                                     <Input
-                                                        placeholder="Company@email.com"
+                                                        placeholder="company@email.com"
                                                         {...field}
                                                     />
                                                 </FormControl>
@@ -475,7 +453,7 @@ export default function RecruitForm() {
                                                 <FormLabel>Website</FormLabel>
                                                 <FormControl>
                                                     <Input
-                                                        placeholder="Company.com"
+                                                        placeholder="https://www.company.com/"
                                                         {...field}
                                                     />
                                                 </FormControl>
