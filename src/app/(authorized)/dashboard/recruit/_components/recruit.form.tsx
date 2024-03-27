@@ -6,7 +6,7 @@ import Image from "next/image";
 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm, SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import {
     Form,
     FormControl,
@@ -35,13 +35,18 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Barangay, City, Province, Region } from "@/lib/types";
-import { eq } from "drizzle-orm";
 import { numberOfEmployee } from "@/lib/data/data.number-employees";
 import { Tag, TagInput } from "@/components/ui/tag/tag-input";
 import { Markets } from "@/lib/data/data.markets";
 import { CompanySchema } from "@/lib/schema/zod/company.schema";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { JobSchema } from "@/lib/schema/zod/job.schema";
+import Tiptap from "@/components/tiptap/tiptap";
+import { jobTypeEnum, workArrangementEnum } from "@/lib/data/data.enum";
 
-type Inputs = z.infer<typeof CompanySchema>;
+const MergeSchema = CompanySchema.merge(JobSchema);
+type Inputs = z.infer<typeof MergeSchema>;
 
 const steps = [
     {
@@ -49,7 +54,7 @@ const steps = [
         name: "Company Information",
         fields: [
             "companyName",
-            "logo",
+            "companyLogo",
             "companyDesc",
             "industry",
             "companyEmail",
@@ -63,8 +68,15 @@ const steps = [
     },
     {
         id: "Step 2",
-        name: "Jobs",
-        fields: ["country", "state", "city", "street", "zip"],
+        name: "Create a Job",
+        fields: [
+            "jobTitle",
+            "jobDesc",
+            "jobType",
+            "workArrangement",
+            "yearsExp",
+            "skills",
+        ],
     },
     { id: "Step 3", name: "Complete" },
 ];
@@ -129,8 +141,8 @@ export default function RecruitForm() {
         region();
     }, []);
 
-    const form = useForm<z.infer<typeof CompanySchema>>({
-        resolver: zodResolver(CompanySchema),
+    const form = useForm<z.infer<typeof MergeSchema>>({
+        resolver: zodResolver(MergeSchema),
         mode: "onChange",
         defaultValues: {
             companyName: "",
@@ -143,6 +155,9 @@ export default function RecruitForm() {
             barangay: "",
             industry: [],
             numEmployee: "",
+            jobTitle: "",
+            jobDesc: "",
+            skills: [],
         },
     });
 
@@ -167,13 +182,13 @@ export default function RecruitForm() {
 
     const next = async () => {
         const fields = steps[currentStep].fields;
-        const output = await form.trigger(fields as FieldName[], {
-            shouldFocus: true,
-        });
+        // const output = await form.trigger(fields as FieldName[], {
+        //     shouldFocus: true,
+        // });
 
-        console.log(form.getValues());
+        // console.log(form.getValues());
 
-        if (!output) return;
+        // if (!output) return;
 
         if (currentStep < steps.length - 1) {
             if (currentStep === steps.length - 2) {
@@ -204,7 +219,7 @@ export default function RecruitForm() {
     };
 
     return (
-        <section className="flex flex-col justify-between p-24">
+        <section className="flex flex-col justify-between p-24 pt-10">
             {/* steps */}
             <nav aria-label="Progress">
                 <ol
@@ -214,7 +229,7 @@ export default function RecruitForm() {
                     {steps.map((step, index) => (
                         <li key={step.name} className="md:flex-1">
                             {currentStep > index ? (
-                                <div className="group flex w-full flex-col border-l-4 border-highlight py-2 pl-4 transition-colors md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4">
+                                <div className="group flex w-full flex-col border-l-4 border-highlight py-2 pl-4 transition-colors md:border-l-0 md:border-t-8 md:pb-0 md:pl-0 md:pt-4">
                                     <span className="text-sm font-medium text-highlight transition-colors ">
                                         {step.id}
                                     </span>
@@ -224,7 +239,7 @@ export default function RecruitForm() {
                                 </div>
                             ) : currentStep === index ? (
                                 <div
-                                    className="flex w-full flex-col border-l-4 border-highlight py-2 pl-4 md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4"
+                                    className="flex w-full flex-col border-l-4 border-highlight py-2 pl-4 md:border-l-0 md:border-t-8 md:pb-0 md:pl-0 md:pt-4"
                                     aria-current="step"
                                 >
                                     <span className="text-sm font-medium text-highlight">
@@ -235,7 +250,7 @@ export default function RecruitForm() {
                                     </span>
                                 </div>
                             ) : (
-                                <div className="group flex w-full flex-col border-l-4 border-gray-200 py-2 pl-4 transition-colors md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4">
+                                <div className="group flex w-full flex-col border-l-4 border-gray-200 py-2 pl-4 transition-colors md:border-l-0 md:border-t-8 md:pb-0 md:pl-0 md:pt-4">
                                     <span className="text-sm font-medium text-muted-foreground transition-colors">
                                         {step.id}
                                     </span>
@@ -274,6 +289,7 @@ export default function RecruitForm() {
                                         Provide your company details.
                                     </p>
                                 </div>
+
                                 <Image
                                     priority
                                     src={imagePreviewUrl ?? "/200x200.svg"}
@@ -313,7 +329,7 @@ export default function RecruitForm() {
                                 <div className="sm:col-span-3">
                                     <FormField
                                         control={form.control}
-                                        name="logo"
+                                        name="companyLogo"
                                         render={({
                                             field: {
                                                 value,
@@ -365,7 +381,7 @@ export default function RecruitForm() {
                                                     Company Description
                                                 </FormLabel>
                                                 <FormControl>
-                                                    <Input
+                                                    <Textarea
                                                         placeholder="Describe your company"
                                                         {...field}
                                                     />
@@ -742,24 +758,167 @@ export default function RecruitForm() {
                             }}
                             animate={{ x: 0, opacity: 1 }}
                             transition={{ duration: 0.3, ease: "easeInOut" }}
+                            className="mx-auto w-8/12"
                         >
-                            <h2 className="text-base font-semibold leading-7 text-gray-900">
-                                Address
-                            </h2>
-                            <p className="mt-1 text-sm leading-6 text-gray-600">
-                                Address where you can receive mail.
-                            </p>
+                            <div className="flex items-end justify-between">
+                                <div className="flex flex-col">
+                                    <h2 className="text-base font-semibold leading-7 text-gray-900">
+                                        Job Details
+                                    </h2>
+                                    <p className="mt-1 text-sm leading-6 text-gray-600">
+                                        What is the job about?
+                                    </p>
+                                </div>
+                            </div>
 
-                            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                                <div className="sm:col-span-3"></div>
+                            <div className="mt-8 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                                <div className="sm:col-span-6">
+                                    <FormField
+                                        control={form.control}
+                                        name="jobTitle"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel required={true}>
+                                                    Job Title
+                                                </FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        placeholder="Job Title"
+                                                        type="text"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormDescription>
+                                                    What is the position called?
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
 
-                                <div className="col-span-full"></div>
+                                <div className="sm:col-span-6">
+                                    <FormField
+                                        control={form.control}
+                                        name="jobDesc"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel required={true}>
+                                                    Job Description
+                                                </FormLabel>
+                                                <FormControl className="">
+                                                    <Tiptap
+                                                        onChange={
+                                                            field.onChange
+                                                        }
+                                                    />
+                                                </FormControl>
+                                                <FormDescription>
+                                                    What are the job
+                                                    responsibilities?
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
 
-                                <div className="sm:col-span-2 sm:col-start-1"></div>
+                                <div className="sm:col-span-6">
+                                    <FormField
+                                        control={form.control}
+                                        name="jobType"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel required={true}>
+                                                    Job Type
+                                                </FormLabel>
+                                                <Select
+                                                    onValueChange={
+                                                        field.onChange
+                                                    }
+                                                    defaultValue={field.value}
+                                                >
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select your job type" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {jobTypeEnum.map(
+                                                            (
+                                                                jobtype,
+                                                                index
+                                                            ) => (
+                                                                <SelectItem
+                                                                    key={index}
+                                                                    value={
+                                                                        jobtype
+                                                                    }
+                                                                >
+                                                                    {jobtype}
+                                                                </SelectItem>
+                                                            )
+                                                        )}
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormDescription>
+                                                    What type of Job is it?
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
 
-                                <div className="sm:col-span-2"></div>
-
-                                <div className="sm:col-span-2"></div>
+                                <div className="sm:col-span-6">
+                                    <FormField
+                                        control={form.control}
+                                        name="workArrangement"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel required={true}>
+                                                    Work Arrangement
+                                                </FormLabel>
+                                                <Select
+                                                    onValueChange={
+                                                        field.onChange
+                                                    }
+                                                    defaultValue={field.value}
+                                                >
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select your work arrangement" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {workArrangementEnum.map(
+                                                            (
+                                                                arrangement,
+                                                                index
+                                                            ) => (
+                                                                <SelectItem
+                                                                    key={index}
+                                                                    value={
+                                                                        arrangement
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        arrangement
+                                                                    }
+                                                                </SelectItem>
+                                                            )
+                                                        )}
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormDescription>
+                                                    Is it Remote, Hybrid or
+                                                    On-site?
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
                             </div>
                         </motion.div>
                     )}
@@ -779,12 +938,7 @@ export default function RecruitForm() {
             {/* Navigation */}
             <div className="mt-8 pt-5">
                 <div className="flex justify-between">
-                    <button
-                        type="button"
-                        onClick={prev}
-                        disabled={currentStep === 0}
-                        className="rounded bg-white px-2 py-1 text-sm font-semibold text-sky-900 shadow-sm ring-1 ring-inset ring-sky-300 hover:bg-sky-50 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
+                    <Button onClick={prev} disabled={currentStep === 0}>
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -799,12 +953,11 @@ export default function RecruitForm() {
                                 d="M15.75 19.5L8.25 12l7.5-7.5"
                             />
                         </svg>
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         type="button"
                         onClick={next}
                         disabled={currentStep === steps.length - 1}
-                        className="rounded bg-white px-2 py-1 text-sm font-semibold text-sky-900 shadow-sm ring-1 ring-inset ring-sky-300 hover:bg-sky-50 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -820,7 +973,7 @@ export default function RecruitForm() {
                                 d="M8.25 4.5l7.5 7.5-7.5 7.5"
                             />
                         </svg>
-                    </button>
+                    </Button>
                 </div>
             </div>
         </section>

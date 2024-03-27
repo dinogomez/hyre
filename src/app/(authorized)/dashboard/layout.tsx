@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getUser } from "@/lib/auth";
 import DashboardHeader from "./_components/dashboard.header";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
     title: "Hyre",
@@ -16,6 +17,10 @@ export default async function DashboardLayout({
     children: React.ReactNode;
 }>) {
     const { user } = await getUser();
+
+    if (!user) {
+        return redirect("/");
+    }
 
     return (
         <div className="flex min-h-screen w-screen flex-col ">

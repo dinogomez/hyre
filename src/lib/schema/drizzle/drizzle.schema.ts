@@ -1,17 +1,13 @@
 import { integer, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
+import {
+    jobTypeEnum as jte,
+    workArrangementEnum as wae,
+} from "@/lib/data/data.enum";
 
-export const jobTypeEnum = pgEnum("jobtype", [
-    "Full-Time",
-    "Contract",
-    "Intern",
-]);
+export const jobTypeEnum = pgEnum("jobtype", jte);
 
-export const workArrangementEnum = pgEnum("workarrangement", [
-    "Onsite",
-    "Hybrid",
-    "Remote",
-]);
+export const workArrangementEnum = pgEnum("workarrangement", wae);
 
 export const userTable = pgTable("user", {
     id: text("id").primaryKey(),
@@ -21,7 +17,7 @@ export const userTable = pgTable("user", {
     email: text("email").unique(),
     password: text("password"),
     skills: text("skills").array(),
-    profilePicture: text("profilePicture"),
+    avatar: text("avatar"),
 });
 
 export const companyTable = pgTable("company", {
@@ -35,7 +31,6 @@ export const companyTable = pgTable("company", {
     province: text("location"),
     city: text("location"),
     barangay: text("location"),
-
     industry: text("industry").array(),
     companyLogo: text("companyLogo"),
     numEmployee: text("numEmployee"),
@@ -44,8 +39,8 @@ export const companyTable = pgTable("company", {
 export const jobTable = pgTable("job", {
     id: text("id").primaryKey(),
     createdAt: timestamp("createdAt").default(sql`CURRENT_TIMESTAMP`),
-    title: text("Title"),
-    desc: text("desc"),
+    jobTitle: text("Title"),
+    jobDesc: text("desc"),
     jobType: jobTypeEnum("jobTypeEnum"),
     workArrangement: workArrangementEnum("workArrangementEnum"),
     yearsExp: integer("yearsExp"),
