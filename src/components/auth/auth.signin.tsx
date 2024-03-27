@@ -116,6 +116,25 @@ function SignIn({ label }: SignInProps) {
                                                             type="email"
                                                             autoComplete="off"
                                                             {...field}
+                                                            onKeyDown={(e) => {
+                                                                if (
+                                                                    e.key ===
+                                                                    "Enter"
+                                                                ) {
+                                                                    e.preventDefault();
+                                                                    const passwordInput =
+                                                                        document.querySelector(
+                                                                            'input[name="password"]'
+                                                                        );
+                                                                    if (
+                                                                        passwordInput &&
+                                                                        passwordInput instanceof
+                                                                            HTMLInputElement
+                                                                    ) {
+                                                                        passwordInput.focus();
+                                                                    }
+                                                                }
+                                                            }}
                                                         />
                                                     </FormControl>
                                                     <FormMessage />
@@ -142,10 +161,23 @@ function SignIn({ label }: SignInProps) {
                                                                         : "password"
                                                                 }
                                                                 autoComplete="off"
+                                                                onKeyDown={(
+                                                                    e
+                                                                ) => {
+                                                                    if (
+                                                                        e.key ===
+                                                                        "Enter"
+                                                                    ) {
+                                                                        form.handleSubmit(
+                                                                            onSubmit
+                                                                        )(e);
+                                                                    }
+                                                                }}
                                                                 {...field}
                                                             />
-                                                            <button
-                                                                className="absolute inset-y-0 right-0 flex items-center px-4 text-gray-600"
+                                                            <Button
+                                                                variant="ghost"
+                                                                className="absolute inset-y-0 right-0 flex items-center px-4 text-muted-foreground hover:bg-transparent"
                                                                 onClick={(
                                                                     e
                                                                 ) => {
@@ -158,7 +190,7 @@ function SignIn({ label }: SignInProps) {
                                                                 ) : (
                                                                     <EyeOff className="h-5 w-5 text-muted-foreground" />
                                                                 )}
-                                                            </button>
+                                                            </Button>
                                                         </div>
                                                     </FormControl>
                                                     <FormMessage />
