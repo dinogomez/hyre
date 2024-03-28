@@ -3,7 +3,7 @@ export interface iObject {
     label: string;
 }
 
-export interface iMarket {
+export interface iObjectT {
     id: string;
     text: string;
 }

@@ -24,7 +24,7 @@ export function Toolbar({ editor }: Props) {
     }
 
     return (
-        <div className="flex items-center divide-x divide-solid rounded-md">
+        <div className="flex items-center divide-x divide-solid rounded-t-md border-x border-t border-input">
             <div className="">
                 <Toggle
                     size="sm"

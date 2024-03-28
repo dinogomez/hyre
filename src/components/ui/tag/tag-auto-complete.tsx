@@ -96,7 +96,7 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({
                 {inputFocused &&
                     maxTags !== undefined &&
                     tags.length < maxTags && (
-                        <CommandGroup heading="Suggestions">
+                        <CommandGroup heading="Select from the options">
                             <CommandEmpty>No results found.</CommandEmpty>
 
                             {autocompleteOptions.map((option) => (

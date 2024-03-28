@@ -1,6 +1,6 @@
-import { iMarket } from "../types";
+import { iObjectT } from "../types";
 
-export const Markets: iMarket[] = [
+export const Markets: iObjectT[] = [
     { id: "blockchain", text: "Blockchain" },
     { id: "healthAndWellness", text: "Health and Wellness" },
     { id: "mobile", text: "Mobile" },

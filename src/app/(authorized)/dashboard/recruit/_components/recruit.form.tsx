@@ -44,6 +44,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { JobSchema } from "@/lib/schema/zod/job.schema";
 import Tiptap from "@/components/tiptap/tiptap";
 import { jobTypeEnum, workArrangementEnum } from "@/lib/data/data.enum";
+import { Skills } from "@/lib/data/data.skills";
 
 const MergeSchema = CompanySchema.merge(JobSchema);
 type Inputs = z.infer<typeof MergeSchema>;
@@ -97,7 +98,8 @@ export default function RecruitForm() {
 
     const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>();
     const [imageBase64, setImageBase64] = useState<string>("");
-    const [autocompleteTags, setAutocompleteTags] = useState<Tag[]>([]);
+    const [industryTags, setIndustryTags] = useState<Tag[]>([]);
+    const [skillTags, setSkillTags] = useState<Tag[]>([]);
 
     const delta = currentStep - previousStep;
 
@@ -162,16 +164,28 @@ export default function RecruitForm() {
     });
 
     form.register("industry", {
-        value: autocompleteTags.map((tag) => tag.text),
+        value: industryTags.map((tag) => tag.text),
+    });
+
+    form.register("skills", {
+        value: skillTags.map((tag) => tag.text),
     });
 
     useEffect(() => {
-        const industryValues = autocompleteTags.map((tag) => tag.text);
+        const industryValues = industryTags.map((tag) => tag.text);
         form.setValue("industry", industryValues);
-        if (autocompleteTags.length > 0) {
+        if (industryTags.length > 0) {
             form.trigger("industry");
         }
-    }, [autocompleteTags, form]);
+    }, [industryTags, form]);
+
+    useEffect(() => {
+        const skillsValues = skillTags.map((tag) => tag.text);
+        form.setValue("skills", skillsValues);
+        if (skillTags.length > 0) {
+            form.trigger("skills");
+        }
+    }, [skillTags, form]);
 
     const processForm: SubmitHandler<Inputs> = (data) => {
         console.log(data);
@@ -409,9 +423,7 @@ export default function RecruitForm() {
                                                         <TagInput
                                                             {...field}
                                                             placeholder="Search for industries."
-                                                            tags={
-                                                                autocompleteTags
-                                                            }
+                                                            tags={industryTags}
                                                             enableAutocomplete
                                                             maxTags={5}
                                                             autocompleteOptions={
@@ -421,7 +433,7 @@ export default function RecruitForm() {
                                                             setTags={(
                                                                 newTags
                                                             ) => {
-                                                                setAutocompleteTags(
+                                                                setIndustryTags(
                                                                     newTags
                                                                 );
                                                             }}
@@ -816,6 +828,48 @@ export default function RecruitForm() {
                                                 <FormDescription>
                                                     What are the job
                                                     responsibilities?
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+
+                                <div className="sm:col-span-6">
+                                    <FormField
+                                        control={form.control}
+                                        name="skills"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel required={true}>
+                                                    Skills
+                                                </FormLabel>
+                                                <FormControl>
+                                                    <div className="w-full">
+                                                        <TagInput
+                                                            {...field}
+                                                            placeholder="Search for industries."
+                                                            tags={skillTags}
+                                                            restrictTagsToAutocompleteOptions
+                                                            enableAutocomplete
+                                                            maxTags={5}
+                                                            autocompleteOptions={
+                                                                Skills
+                                                            }
+                                                            className="sm:min-w-[450px]"
+                                                            setTags={(
+                                                                newTags
+                                                            ) => {
+                                                                setSkillTags(
+                                                                    newTags
+                                                                );
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </FormControl>
+                                                <FormDescription>
+                                                    What industries is the
+                                                    company in? Maximum of 5.
                                                 </FormDescription>
                                                 <FormMessage />
                                             </FormItem>

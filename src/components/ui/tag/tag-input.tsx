@@ -169,8 +169,7 @@ const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
                 ) {
                     toast({
                         title: "Invalid Tag",
-                        description:
-                            "Please select a tag from the autocomplete options.",
+                        description: "Please select a tag from the options.",
                         variant: "destructive",
                     });
                     return;
