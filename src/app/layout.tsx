@@ -23,14 +23,12 @@ export default function RootLayout({
             <body
                 className={`${GeistSans.variable} ${GeistMono.variable} w-screen overflow-x-hidden font-sans`}
             >
-                <div>
-                    <Provider>
-                        <div>
-                            {children}
-                            <Toaster />
-                        </div>
-                    </Provider>
-                </div>
+                <Provider>
+                    <div>
+                        {children}
+                        <Toaster />
+                    </div>
+                </Provider>
             </body>
         </html>
     );

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-
+import Link from "next/link";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -45,6 +45,7 @@ import { JobSchema } from "@/lib/schema/zod/job.schema";
 import Tiptap from "@/components/tiptap/tiptap";
 import { jobTypeEnum, workArrangementEnum } from "@/lib/data/data.enum";
 import { Skills } from "@/lib/data/data.skills";
+import { CheckCircle2 } from "lucide-react";
 
 const MergeSchema = CompanySchema.merge(JobSchema);
 type Inputs = z.infer<typeof MergeSchema>;
@@ -848,7 +849,7 @@ export default function RecruitForm() {
                                                     <div className="w-full">
                                                         <TagInput
                                                             {...field}
-                                                            placeholder="Search for industries."
+                                                            placeholder="Search for skills."
                                                             tags={skillTags}
                                                             restrictTagsToAutocompleteOptions
                                                             enableAutocomplete
@@ -868,8 +869,8 @@ export default function RecruitForm() {
                                                     </div>
                                                 </FormControl>
                                                 <FormDescription>
-                                                    What industries is the
-                                                    company in? Maximum of 5.
+                                                    What skills are needed for
+                                                    the job? Maximum of 5.
                                                 </FormDescription>
                                                 <FormMessage />
                                             </FormItem>
@@ -877,7 +878,7 @@ export default function RecruitForm() {
                                     />
                                 </div>
 
-                                <div className="sm:col-span-6">
+                                <div className="sm:col-span-3">
                                     <FormField
                                         control={form.control}
                                         name="jobType"
@@ -924,7 +925,7 @@ export default function RecruitForm() {
                                     />
                                 </div>
 
-                                <div className="sm:col-span-6">
+                                <div className="sm:col-span-3">
                                     <FormField
                                         control={form.control}
                                         name="workArrangement"
@@ -978,21 +979,79 @@ export default function RecruitForm() {
                     )}
 
                     {currentStep === 2 && (
-                        <>
-                            <h2 className="text-base font-semibold leading-7 text-gray-900">
-                                Complete
-                            </h2>
-                            <p className="mt-1 text-sm leading-6 text-gray-600">
+                        <motion.div
+                            className="text-centerl container flex w-full flex-col items-center justify-center gap-y-4"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{
+                                opacity: 1,
+                                y: 0,
+                                transition: {
+                                    duration: 0.5,
+                                    ease: "easeInOut",
+                                    staggerChildren: 0.2,
+                                },
+                            }}
+                        >
+                            <motion.div
+                                initial={{ scale: 0, opacity: 0 }}
+                                animate={{
+                                    scale: 1,
+                                    opacity: 1,
+                                    transition: {
+                                        duration: 0.3,
+                                        ease: "easeInOut",
+                                    },
+                                }}
+                                className="my-4"
+                            >
+                                <CheckCircle2 className="h-20 w-20 fill-green-500 text-white" />
+                            </motion.div>
+                            <motion.h2
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{
+                                    opacity: 1,
+                                    y: 0,
+                                    transition: {
+                                        duration: 0.5,
+                                        ease: "easeInOut",
+                                    },
+                                }}
+                                className="text-5xl font-black leading-7 text-gray-900"
+                            >
+                                Posting Complete
+                            </motion.h2>
+                            <motion.p
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{
+                                    opacity: 1,
+                                    y: 0,
+                                    transition: {
+                                        duration: 0.5,
+                                        ease: "easeInOut",
+                                    },
+                                }}
+                                className="mt-1 text-sm leading-6 text-gray-600"
+                            >
                                 Thank you for your submission.
-                            </p>
-                        </>
+                            </motion.p>
+                            <Link href="/dashboard">
+                                <Button variant="outline">Return</Button>
+                            </Link>
+                        </motion.div>
                     )}
                 </form>
             </Form>
             {/* Navigation */}
-            <div className="mt-8 pt-5">
+            <div
+                className={`mt-8 pt-5 ${currentStep === steps.length - 1 ? "hidden" : ""}`}
+            >
                 <div className="flex justify-between">
-                    <Button onClick={prev} disabled={currentStep === 0}>
+                    <Button
+                        onClick={() => {
+                            prev();
+                        }}
+                        disabled={currentStep === 0}
+                    >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
