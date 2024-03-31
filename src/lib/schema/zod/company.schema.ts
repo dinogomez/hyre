@@ -15,7 +15,6 @@ export const CompanySchema = z.object({
         .url("Please enter a valid https url.")
         .optional()
         .or(z.literal("")),
-    region: z.string().min(1, "Address is required."),
     province: z.string().min(1, "Select a region first."),
     city: z.string().min(1, "Select a province first."),
     barangay: z.string(),

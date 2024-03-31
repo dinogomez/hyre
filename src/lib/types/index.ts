@@ -25,7 +25,7 @@ export interface Barangay {
 
 export interface City {
     city_code: string;
-    city_name: string;
+    city_name: string | null;
     province_code: string;
     psgc_code: string;
     region_code: string;

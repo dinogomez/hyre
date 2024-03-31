@@ -16,4 +16,8 @@ export const JobSchema = z.object({
     skills: z.array(z.string()).refine((value) => value.some((item) => item), {
         message: "You have to select at least one skill requirement.",
     }),
+    exactAddress: z.string(),
+    province: z.string().min(1, "Select a region first."),
+    city: z.string().min(1, "Select a province first."),
+    barangay: z.string(),
 });
