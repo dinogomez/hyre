@@ -85,11 +85,10 @@ const steps = [
 
 export default function RecruitForm() {
     const [regionData, setRegion] = useState([]);
-    const [provinceData, setProvince] = useState([]);
-    const [cityData, setCity] = useState([]);
-    const [barangayData, setBarangay] = useState([]);
+    const [provinceData, setProvince] = useState<Province[]>([]);
+    const [cityData, setCity] = useState<City[]>([]);
+    const [barangayData, setBarangay] = useState<Barangay[]>([]);
 
-    const [regionAddr, setRegionAddr] = useState("");
     const [provinceAddr, setProvinceAddr] = useState("");
     const [cityAddr, setCityAddr] = useState("");
     const [barangayAddr, setBarangayAddr] = useState("");
@@ -104,44 +103,42 @@ export default function RecruitForm() {
 
     const delta = currentStep - previousStep;
 
-    const region = () => {
-        regions().then((response) => {
-            setRegion(response);
-        });
-    };
-
-    const province = (e: string) => {
-        setRegionAddr(e);
-        provinces(e).then((response) => {
-            setProvince(response);
-            setProvinceAddr("");
-            setCityAddr("");
-            setBarangayAddr("");
-            setCity([]);
-            setBarangay([]);
-        });
-    };
-
     const city = (e: string) => {
-        setProvinceAddr(e);
         cities(e).then((response) => {
             setCity(response);
         });
     };
 
     const barangay = (e: string) => {
-        setCityAddr(e);
         barangays(e).then((response) => {
             setBarangay(response);
         });
     };
 
-    const brgy = (e: string) => {
-        setBarangayAddr(e);
+    const loadAllProvinces = async () => {
+        try {
+            const allRegions = await regions();
+            const allProvinces = await Promise.all(
+                allRegions.map((region: Region) =>
+                    provinces(region.region_code)
+                )
+            );
+            const flattenedProvinces = allProvinces.flat();
+            const sortedProvinces = flattenedProvinces
+                .sort((a, b) => a.province_name.localeCompare(b.province_name))
+                .filter(
+                    (province) =>
+                        province.province_name !==
+                        "Ncr, City Of Manila, First District"
+                );
+            setProvince(sortedProvinces);
+        } catch (error) {
+            console.error("Error loading provinces:", error);
+        }
     };
 
     useEffect(() => {
-        region();
+        loadAllProvinces();
     }, []);
 
     const form = useForm<z.infer<typeof MergeSchema>>({
@@ -152,7 +149,6 @@ export default function RecruitForm() {
             companyDesc: "",
             companyEmail: "",
             website: "",
-            region: "",
             province: "",
             city: "",
             barangay: "",
@@ -201,7 +197,7 @@ export default function RecruitForm() {
         //     shouldFocus: true,
         // });
 
-        // console.log(form.getValues());
+        console.log(form.getValues());
 
         // if (!output) return;
 
@@ -491,46 +487,43 @@ export default function RecruitForm() {
                                         )}
                                     />
                                 </div>
-                                <div className="sm:col-span-3">
+
+                                <div className="sm:col-span-6">
                                     <FormField
                                         control={form.control}
-                                        name="region"
+                                        name="numEmployee"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel required={true}>
-                                                    Region
+                                                    Number of Employees
                                                 </FormLabel>
                                                 <Select
-                                                    onValueChange={(value) => {
-                                                        field.onChange(value);
-                                                        region();
-                                                        province(value);
-                                                    }}
+                                                    onValueChange={
+                                                        field.onChange
+                                                    }
                                                     defaultValue={field.value}
                                                 >
                                                     <FormControl>
                                                         <SelectTrigger>
-                                                            <SelectValue placeholder="Select a Region" />
+                                                            <SelectValue placeholder="Select the number of employees" />
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
-                                                        {regionData &&
-                                                            regionData.length >
+                                                        {numberOfEmployee &&
+                                                            numberOfEmployee.length >
                                                                 0 &&
-                                                            regionData.map(
-                                                                (
-                                                                    item: Region
-                                                                ) => (
+                                                            numberOfEmployee.map(
+                                                                (item) => (
                                                                     <SelectItem
                                                                         key={
-                                                                            item.region_code
+                                                                            item.id
                                                                         }
                                                                         value={
-                                                                            item.region_code
+                                                                            item.id
                                                                         }
                                                                     >
                                                                         {
-                                                                            item.region_name
+                                                                            item.label
                                                                         }
                                                                     </SelectItem>
                                                                 )
@@ -538,14 +531,15 @@ export default function RecruitForm() {
                                                     </SelectContent>
                                                 </Select>
                                                 <FormDescription>
-                                                    Select your region.
+                                                    How big is the company?
                                                 </FormDescription>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
                                     />
                                 </div>
-                                <div className="sm:col-span-3">
+
+                                <div className="sm:col-span-6">
                                     <FormField
                                         control={form.control}
                                         name="province"
@@ -557,10 +551,22 @@ export default function RecruitForm() {
                                                 <Select
                                                     onValueChange={(value) => {
                                                         field.onChange(value);
+                                                        form.setValue(
+                                                            "province",
+                                                            provinceData.find(
+                                                                (
+                                                                    item: Province
+                                                                ) =>
+                                                                    item.province_code ===
+                                                                    value
+                                                            )?.province_name ??
+                                                                ""
+                                                        );
+                                                        setProvinceAddr(value);
+
                                                         city(value);
                                                     }}
                                                     defaultValue={field.value}
-                                                    disabled={!regionAddr}
                                                 >
                                                     <FormControl>
                                                         <SelectTrigger>
@@ -611,6 +617,15 @@ export default function RecruitForm() {
                                                 <Select
                                                     onValueChange={(value) => {
                                                         field.onChange(value);
+                                                        form.setValue(
+                                                            "city",
+                                                            cityData.find(
+                                                                (item: City) =>
+                                                                    item.city_code ===
+                                                                    value
+                                                            )?.city_name ?? ""
+                                                        );
+                                                        setCityAddr(value);
                                                         barangay(value);
                                                     }}
                                                     defaultValue={field.value}
@@ -666,7 +681,17 @@ export default function RecruitForm() {
                                                 <Select
                                                     onValueChange={(value) => {
                                                         field.onChange(value);
-                                                        brgy(value);
+                                                        form.setValue(
+                                                            "barangay",
+                                                            barangayData.find(
+                                                                (
+                                                                    item: Barangay
+                                                                ) =>
+                                                                    item.brgy_code ===
+                                                                    value
+                                                            )?.brgy_name ?? ""
+                                                        );
+                                                        setBarangayAddr(value);
                                                     }}
                                                     defaultValue={field.value}
                                                     disabled={!cityAddr}
@@ -702,57 +727,6 @@ export default function RecruitForm() {
                                                 </Select>
                                                 <FormDescription>
                                                     Select your barangay.
-                                                </FormDescription>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
-
-                                <div className="sm:col-span-6">
-                                    <FormField
-                                        control={form.control}
-                                        name="numEmployee"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel required={true}>
-                                                    Number of Employees
-                                                </FormLabel>
-                                                <Select
-                                                    onValueChange={
-                                                        field.onChange
-                                                    }
-                                                    defaultValue={field.value}
-                                                >
-                                                    <FormControl>
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder="Select the number of employees" />
-                                                        </SelectTrigger>
-                                                    </FormControl>
-                                                    <SelectContent>
-                                                        {numberOfEmployee &&
-                                                            numberOfEmployee.length >
-                                                                0 &&
-                                                            numberOfEmployee.map(
-                                                                (item) => (
-                                                                    <SelectItem
-                                                                        key={
-                                                                            item.id
-                                                                        }
-                                                                        value={
-                                                                            item.id
-                                                                        }
-                                                                    >
-                                                                        {
-                                                                            item.label
-                                                                        }
-                                                                    </SelectItem>
-                                                                )
-                                                            )}
-                                                    </SelectContent>
-                                                </Select>
-                                                <FormDescription>
-                                                    How big is the company?
                                                 </FormDescription>
                                                 <FormMessage />
                                             </FormItem>
