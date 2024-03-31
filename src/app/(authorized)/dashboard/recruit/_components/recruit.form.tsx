@@ -46,6 +46,8 @@ import Tiptap from "@/components/tiptap/tiptap";
 import { jobTypeEnum, workArrangementEnum } from "@/lib/data/data.enum";
 import { Skills } from "@/lib/data/data.skills";
 import { CheckCircle2 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useSession } from "@/components/provider/session-provider";
 
 const MergeSchema = CompanySchema.merge(JobSchema);
 type Inputs = z.infer<typeof MergeSchema>;
@@ -84,6 +86,7 @@ const steps = [
 ];
 
 export default function RecruitForm() {
+    const { user } = useSession();
     const [regionData, setRegion] = useState([]);
     const [provinceData, setProvince] = useState<Province[]>([]);
     const [cityData, setCity] = useState<City[]>([]);
@@ -100,6 +103,8 @@ export default function RecruitForm() {
     const [imageBase64, setImageBase64] = useState<string>("");
     const [industryTags, setIndustryTags] = useState<Tag[]>([]);
     const [skillTags, setSkillTags] = useState<Tag[]>([]);
+
+    const [useEmail, setUseEmail] = useState(false);
 
     const delta = currentStep - previousStep;
 
@@ -157,6 +162,10 @@ export default function RecruitForm() {
             jobTitle: "",
             jobDesc: "",
             skills: [],
+            jobType: "Full-Time",
+            workArrangement: "Hybrid",
+            primaryEmail: "",
+            secondaryEmail: "",
         },
     });
 
@@ -193,13 +202,13 @@ export default function RecruitForm() {
 
     const next = async () => {
         const fields = steps[currentStep].fields;
-        // const output = await form.trigger(fields as FieldName[], {
-        //     shouldFocus: true,
-        // });
+        const output = await form.trigger(fields as FieldName[], {
+            shouldFocus: true,
+        });
 
         console.log(form.getValues());
 
-        // if (!output) return;
+        if (!output) return;
 
         if (currentStep < steps.length - 1) {
             if (currentStep === steps.length - 2) {
@@ -537,6 +546,19 @@ export default function RecruitForm() {
                                             </FormItem>
                                         )}
                                     />
+                                </div>
+
+                                <div className="sm:col-span-6">
+                                    <div className="flex items-end justify-between">
+                                        <div className="flex flex-col">
+                                            <h2 className="text-base font-semibold leading-7 text-gray-900">
+                                                Location
+                                            </h2>
+                                            <p className="mt-1 text-sm leading-6 text-gray-600">
+                                                Where is the company located?
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div className="sm:col-span-6">
@@ -948,6 +970,120 @@ export default function RecruitForm() {
                                         )}
                                     />
                                 </div>
+                                <div className="sm:col-span-6">
+                                    <div className="flex items-end justify-between">
+                                        <div className="flex flex-col">
+                                            <h2 className="text-base font-semibold leading-7 text-gray-900">
+                                                Contact Details
+                                            </h2>
+                                            <p className="mt-1 text-sm leading-6 text-gray-600">
+                                                Who will be contacted for the
+                                                job updates?
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="sm:col-span-3">
+                                    <FormField
+                                        control={form.control}
+                                        name="primaryEmail"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel required={true}>
+                                                    Primary Email
+                                                </FormLabel>
+                                                <FormDescription>
+                                                    Applications will be sent to
+                                                    this primary address
+                                                </FormDescription>
+                                                <FormControl>
+                                                    <Input
+                                                        placeholder="primary@email.com"
+                                                        {...field}
+                                                        disabled={useEmail}
+                                                        value={
+                                                            useEmail ?? false
+                                                                ? user?.email ||
+                                                                  ""
+                                                                : field.value
+                                                        }
+                                                    />
+                                                </FormControl>
+                                                <FormDescription>
+                                                    <div className="flex items-center space-x-2">
+                                                        <Checkbox
+                                                            className=""
+                                                            checked={useEmail}
+                                                            onCheckedChange={(
+                                                                e
+                                                            ) =>
+                                                                setUseEmail(
+                                                                    !useEmail
+                                                                )
+                                                            }
+                                                        />
+                                                        <label
+                                                            htmlFor="terms"
+                                                            className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                                        >
+                                                            Use my email address
+                                                        </label>
+                                                    </div>
+                                                </FormDescription>
+
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                <div className="sm:col-span-3">
+                                    <FormField
+                                        control={form.control}
+                                        name="secondaryEmail"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>
+                                                    Secondary Email
+                                                </FormLabel>
+                                                <FormDescription>
+                                                    Applications will be sent to
+                                                    this secondary address
+                                                </FormDescription>
+                                                <FormControl>
+                                                    <Input
+                                                        placeholder="secondary@email.com"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+
+                                <div className="sm:col-span-6">
+                                    <FormField
+                                        control={form.control}
+                                        name="redirectUrl"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Job Page</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        placeholder="https://www.company.com/"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormDescription>
+                                                    Applications will redirected
+                                                    to this page.
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
                             </div>
                         </motion.div>
                     )}
@@ -1022,6 +1158,7 @@ export default function RecruitForm() {
                 <div className="flex justify-between">
                     <Button
                         onClick={() => {
+                            window.scrollTo(0, 0);
                             prev();
                         }}
                         disabled={currentStep === 0}
@@ -1043,7 +1180,10 @@ export default function RecruitForm() {
                     </Button>
                     <Button
                         type="button"
-                        onClick={next}
+                        onClick={() => {
+                            window.scrollTo(0, 0);
+                            next();
+                        }}
                         disabled={currentStep === steps.length - 1}
                     >
                         <svg

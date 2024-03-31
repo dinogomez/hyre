@@ -20,4 +20,14 @@ export const JobSchema = z.object({
     province: z.string().min(1, "Select a region first."),
     city: z.string().min(1, "Select a province first."),
     barangay: z.string(),
+    primaryEmail: z
+        .string()
+        .min(1, "Contact Email is required")
+        .email("Invalid email address"),
+    secondaryEmail: z.string().email("Invalid email address"),
+    redirectUrl: z
+        .string()
+        .url("Please enter a valid https url.")
+        .optional()
+        .or(z.literal("")),
 });

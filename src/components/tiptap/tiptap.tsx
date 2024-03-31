@@ -14,15 +14,16 @@ export default function Tiptap({
 }) {
     const editor = useEditor({
         extensions: [
-            StarterKit,
-            BulletList.configure({
-                HTMLAttributes: {
-                    class: "ml-4 list-disc",
+            StarterKit.configure({
+                heading: {
+                    HTMLAttributes: {
+                        class: "mb-1 text-xl font-bold",
+                    },
                 },
-            }),
-            Heading.configure({
-                HTMLAttributes: {
-                    class: "mb-1 text-xl font-bold",
+                bulletList: {
+                    HTMLAttributes: {
+                        class: "ml-4 list-disc",
+                    },
                 },
             }),
             Underline,
