@@ -27,25 +27,33 @@ export const companyTable = pgTable("company", {
     companyDesc: text("companyDesc"),
     companyEmail: text("companyEmail").unique(),
     website: text("website"),
-    region: text("location"),
-    province: text("location"),
-    city: text("location"),
-    barangay: text("location"),
+    province: text("province"),
+    city: text("city"),
+    barangay: text("barangay"),
     industry: text("industry").array(),
     companyLogo: text("companyLogo"),
     numEmployee: text("numEmployee"),
+    userId: text("userId")
+        .notNull()
+        .references(() => userTable.id),
 });
 
 export const jobTable = pgTable("job", {
     id: text("id").primaryKey(),
     createdAt: timestamp("createdAt").default(sql`CURRENT_TIMESTAMP`),
-    jobTitle: text("Title"),
-    jobDesc: text("desc"),
+    jobTitle: text("jobTitle"),
+    jobDesc: text("jobDesc"),
     jobType: jobTypeEnum("jobTypeEnum"),
     workArrangement: workArrangementEnum("workArrangementEnum"),
     yearsExp: integer("yearsExp"),
     skills: text("skills").array(),
-    userContactId: text("userContactId")
+    jProvince: text("province"),
+    jCity: text("city"),
+    jBarangay: text("barangay"),
+    primaryEmail: text("primaryEmail"),
+    secondaryEmail: text("secondaryEmail"),
+    redirectUrl: text("redirectUrl"),
+    userId: text("userId")
         .notNull()
         .references(() => userTable.id),
     companyId: text("companyId")

@@ -17,7 +17,7 @@ export const CompanySchema = z.object({
         .or(z.literal("")),
     province: z.string().min(1, "Select a region first."),
     city: z.string().min(1, "Select a province first."),
-    barangay: z.string(),
+    barangay: z.string().optional(),
     industry: z
         .array(z.string())
         .refine((value) => value.some((item) => item), {
@@ -30,4 +30,5 @@ export const CompanySchema = z.object({
             message: "Please choose a supported format.",
         }),
     numEmployee: z.string().min(1, "Number of employees is required"),
+    userId: z.string().optional(),
 });

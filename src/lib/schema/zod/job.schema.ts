@@ -16,15 +16,14 @@ export const JobSchema = z.object({
     skills: z.array(z.string()).refine((value) => value.some((item) => item), {
         message: "You have to select at least one skill requirement.",
     }),
-    exactAddress: z.string(),
-    province: z.string().min(1, "Select a region first."),
-    city: z.string().min(1, "Select a province first."),
-    barangay: z.string(),
+    jProvince: z.string().min(1, "Select a region first."),
+    jCity: z.string().min(1, "Select a province first."),
+    jBarangay: z.string(),
     primaryEmail: z
         .string()
         .min(1, "Contact Email is required")
         .email("Invalid email address"),
-    secondaryEmail: z.string().email("Invalid email address"),
+    secondaryEmail: z.string().email("Invalid email address").optional(),
     redirectUrl: z
         .string()
         .url("Please enter a valid https url.")
