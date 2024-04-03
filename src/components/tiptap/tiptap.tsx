@@ -6,13 +6,21 @@ import { Toolbar } from "./toolbar";
 import BulletList from "@tiptap/extension-bullet-list";
 import Heading from "@tiptap/extension-heading";
 import Underline from "@tiptap/extension-underline";
-
+import { useEffect, useState } from "react";
 export default function Tiptap({
     onChange,
+    content = "",
+    isEditable = true,
 }: {
     onChange: (richText: string) => void;
+    content?: string;
+    isEditable?: boolean;
 }) {
+    const [editable, setEditable] = useState(isEditable);
+
     const editor = useEditor({
+        editable,
+        content: content,
         extensions: [
             StarterKit.configure({
                 heading: {
@@ -40,9 +48,21 @@ export default function Tiptap({
         },
     });
 
+    useEffect(() => {
+        if (!editor) {
+            return undefined;
+        }
+
+        editor.setEditable(editable);
+    }, [editor, editable]);
+
+    if (!editor) {
+        return null;
+    }
+
     return (
         <div className="flex flex-col">
-            <Toolbar editor={editor} />
+            {editable && <Toolbar editor={editor} />}
             <EditorContent style={{ whiteSpace: "pre-line" }} editor={editor} />
         </div>
     );

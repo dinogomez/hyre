@@ -48,8 +48,10 @@ import { Skills } from "@/lib/data/data.skills";
 import { CheckCircle2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useSession } from "@/components/provider/session-provider";
+import { MergeSchema } from "@/lib/schema/zod/merge.schema";
+import { years } from "@/lib/data/data.years";
+import { recruitAction } from "@/lib/actions/auth.actions";
 
-const MergeSchema = CompanySchema.merge(JobSchema);
 type Inputs = z.infer<typeof MergeSchema>;
 
 const steps = [
@@ -63,7 +65,6 @@ const steps = [
             "industry",
             "companyEmail",
             "website",
-            "region",
             "province",
             "city",
             "barangay",
@@ -80,6 +81,11 @@ const steps = [
             "workArrangement",
             "yearsExp",
             "skills",
+            "jProvince",
+            "jCity",
+            "jBarangay",
+            "primaryEmail",
+            "redirectUrl",
         ],
     },
     { id: "Step 3", name: "Complete" },
@@ -87,14 +93,13 @@ const steps = [
 
 export default function RecruitForm() {
     const { user } = useSession();
-    const [regionData, setRegion] = useState([]);
+
     const [provinceData, setProvince] = useState<Province[]>([]);
     const [cityData, setCity] = useState<City[]>([]);
     const [barangayData, setBarangay] = useState<Barangay[]>([]);
 
-    const [provinceAddr, setProvinceAddr] = useState("");
-    const [cityAddr, setCityAddr] = useState("");
-    const [barangayAddr, setBarangayAddr] = useState("");
+    const [jcityData, jsetCity] = useState<City[]>([]);
+    const [jbarangayData, jsetBarangay] = useState<Barangay[]>([]);
 
     const [previousStep, setPreviousStep] = useState(0);
     const [currentStep, setCurrentStep] = useState(0);
@@ -117,6 +122,18 @@ export default function RecruitForm() {
     const barangay = (e: string) => {
         barangays(e).then((response) => {
             setBarangay(response);
+        });
+    };
+
+    const jcity = (e: string) => {
+        cities(e).then((response) => {
+            jsetCity(response);
+        });
+    };
+
+    const jbarangay = (e: string) => {
+        barangays(e).then((response) => {
+            jsetBarangay(response);
         });
     };
 
@@ -153,6 +170,7 @@ export default function RecruitForm() {
             companyName: "",
             companyDesc: "",
             companyEmail: "",
+            companyLogo: "",
             website: "",
             province: "",
             city: "",
@@ -166,8 +184,14 @@ export default function RecruitForm() {
             workArrangement: "Hybrid",
             primaryEmail: "",
             secondaryEmail: "",
+            jProvince: "",
+            jCity: "",
+            jBarangay: "",
+            redirectUrl: "",
+            userId: user?.id,
         },
     });
+    const { reset, trigger, handleSubmit } = form;
 
     form.register("industry", {
         value: industryTags.map((tag) => tag.text),
@@ -193,26 +217,23 @@ export default function RecruitForm() {
         }
     }, [skillTags, form]);
 
-    const processForm: SubmitHandler<Inputs> = (data) => {
-        console.log(data);
-        form.reset();
-    };
-
     type FieldName = keyof Inputs;
-
+    const processForm: SubmitHandler<Inputs> = async (data) => {
+        const res = await recruitAction(data);
+        console.log(res);
+        reset();
+    };
     const next = async () => {
         const fields = steps[currentStep].fields;
-        const output = await form.trigger(fields as FieldName[], {
+        const output = await trigger(fields as FieldName[], {
             shouldFocus: true,
         });
-
-        console.log(form.getValues());
 
         if (!output) return;
 
         if (currentStep < steps.length - 1) {
             if (currentStep === steps.length - 2) {
-                await form.handleSubmit(processForm)();
+                await handleSubmit(processForm)();
             }
             setPreviousStep(currentStep);
             setCurrentStep((step) => step + 1);
@@ -233,6 +254,7 @@ export default function RecruitForm() {
                 const base64String = reader.result as string;
                 setImageBase64(base64String);
                 setImagePreviewUrl(reader.result as string);
+                console.log(base64String);
             };
             reader.readAsDataURL(file[0]);
         }
@@ -288,7 +310,7 @@ export default function RecruitForm() {
             <Form {...form}>
                 <form
                     className="mt-5 py-12"
-                    onSubmit={form.handleSubmit(processForm)}
+                    onSubmit={handleSubmit(processForm)}
                 >
                     {currentStep === 0 && (
                         <motion.div
@@ -584,8 +606,6 @@ export default function RecruitForm() {
                                                             )?.province_name ??
                                                                 ""
                                                         );
-                                                        setProvinceAddr(value);
-
                                                         city(value);
                                                     }}
                                                     defaultValue={field.value}
@@ -647,11 +667,14 @@ export default function RecruitForm() {
                                                                     value
                                                             )?.city_name ?? ""
                                                         );
-                                                        setCityAddr(value);
                                                         barangay(value);
                                                     }}
                                                     defaultValue={field.value}
-                                                    disabled={!provinceAddr}
+                                                    disabled={
+                                                        !form.getValues(
+                                                            "province"
+                                                        )
+                                                    }
                                                 >
                                                     <FormControl>
                                                         <SelectTrigger>
@@ -713,10 +736,11 @@ export default function RecruitForm() {
                                                                     value
                                                             )?.brgy_name ?? ""
                                                         );
-                                                        setBarangayAddr(value);
                                                     }}
                                                     defaultValue={field.value}
-                                                    disabled={!cityAddr}
+                                                    disabled={
+                                                        !form.getValues("city")
+                                                    }
                                                 >
                                                     <FormControl>
                                                         <SelectTrigger>
@@ -793,7 +817,6 @@ export default function RecruitForm() {
                                                 <FormControl>
                                                     <Input
                                                         placeholder="Job Title"
-                                                        type="text"
                                                         {...field}
                                                     />
                                                 </FormControl>
@@ -867,6 +890,57 @@ export default function RecruitForm() {
                                                 <FormDescription>
                                                     What skills are needed for
                                                     the job? Maximum of 5.
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+
+                                <div className="sm:col-span-6">
+                                    <FormField
+                                        control={form.control}
+                                        name="yearsExp"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel required={true}>
+                                                    Years of Experience
+                                                </FormLabel>
+                                                <Select
+                                                    onValueChange={
+                                                        field.onChange
+                                                    }
+                                                    defaultValue={field.value}
+                                                >
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select the years of experience" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {years &&
+                                                            years.length > 0 &&
+                                                            years.map(
+                                                                (item) => (
+                                                                    <SelectItem
+                                                                        key={
+                                                                            item.id
+                                                                        }
+                                                                        value={
+                                                                            item.id
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            item.label
+                                                                        }
+                                                                    </SelectItem>
+                                                                )
+                                                            )}
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormDescription>
+                                                    How many years of experience
+                                                    is required?
                                                 </FormDescription>
                                                 <FormMessage />
                                             </FormItem>
@@ -1078,6 +1152,216 @@ export default function RecruitForm() {
                                                 <FormDescription>
                                                     Applications will redirected
                                                     to this page.
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+
+                                <div className="sm:col-span-6">
+                                    <div className="flex items-end justify-between">
+                                        <div className="flex flex-col">
+                                            <h2 className="text-base font-semibold leading-7 text-gray-900">
+                                                Location
+                                            </h2>
+                                            <p className="mt-1 text-sm leading-6 text-gray-600">
+                                                Where is the company located?
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="sm:col-span-6">
+                                    <FormField
+                                        control={form.control}
+                                        name="jProvince"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel required={true}>
+                                                    Province
+                                                </FormLabel>
+                                                <Select
+                                                    onValueChange={(value) => {
+                                                        field.onChange(value);
+                                                        form.setValue(
+                                                            "jProvince",
+                                                            provinceData.find(
+                                                                (
+                                                                    item: Province
+                                                                ) =>
+                                                                    item.province_code ===
+                                                                    value
+                                                            )?.province_name ??
+                                                                ""
+                                                        );
+                                                        jcity(value);
+                                                    }}
+                                                    defaultValue={field.value}
+                                                >
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select a Province" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {provinceData &&
+                                                            provinceData.length >
+                                                                0 &&
+                                                            provinceData.map(
+                                                                (
+                                                                    item: Province
+                                                                ) => (
+                                                                    <SelectItem
+                                                                        key={
+                                                                            item.province_code
+                                                                        }
+                                                                        value={
+                                                                            item.province_code
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            item.province_name
+                                                                        }
+                                                                    </SelectItem>
+                                                                )
+                                                            )}
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormDescription>
+                                                    Select your province.
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                <div className="sm:col-span-3">
+                                    <FormField
+                                        control={form.control}
+                                        name="jCity"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel required={true}>
+                                                    City
+                                                </FormLabel>
+                                                <Select
+                                                    onValueChange={(value) => {
+                                                        field.onChange(value);
+                                                        form.setValue(
+                                                            "jCity",
+                                                            jcityData.find(
+                                                                (item: City) =>
+                                                                    item.city_code ===
+                                                                    value
+                                                            )?.city_name ?? ""
+                                                        );
+                                                        jbarangay(value);
+                                                    }}
+                                                    defaultValue={field.value}
+                                                    disabled={
+                                                        !form.getValues(
+                                                            "jProvince"
+                                                        )
+                                                    }
+                                                >
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select a city" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {jcityData &&
+                                                            jcityData.length >
+                                                                0 &&
+                                                            jcityData.map(
+                                                                (
+                                                                    item: City
+                                                                ) => (
+                                                                    <SelectItem
+                                                                        key={
+                                                                            item.city_code
+                                                                        }
+                                                                        value={
+                                                                            item.city_code
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            item.city_name
+                                                                        }
+                                                                    </SelectItem>
+                                                                )
+                                                            )}
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormDescription>
+                                                    Select your city.
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+
+                                <div className="sm:col-span-3">
+                                    <FormField
+                                        control={form.control}
+                                        name="jBarangay"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel optional={true}>
+                                                    Barangay
+                                                </FormLabel>
+                                                <Select
+                                                    onValueChange={(value) => {
+                                                        field.onChange(value);
+                                                        form.setValue(
+                                                            "jBarangay",
+                                                            jbarangayData.find(
+                                                                (
+                                                                    item: Barangay
+                                                                ) =>
+                                                                    item.brgy_code ===
+                                                                    value
+                                                            )?.brgy_name ?? ""
+                                                        );
+                                                    }}
+                                                    defaultValue={field.value}
+                                                    disabled={
+                                                        !form.getValues("jCity")
+                                                    }
+                                                >
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select a Barangay" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {jbarangayData &&
+                                                            jbarangayData.length >
+                                                                0 &&
+                                                            jbarangayData.map(
+                                                                (
+                                                                    item: Barangay
+                                                                ) => (
+                                                                    <SelectItem
+                                                                        key={
+                                                                            item.brgy_code
+                                                                        }
+                                                                        value={
+                                                                            item.brgy_code
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            item.brgy_name
+                                                                        }
+                                                                    </SelectItem>
+                                                                )
+                                                            )}
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormDescription>
+                                                    Select your barangay.
                                                 </FormDescription>
                                                 <FormMessage />
                                             </FormItem>

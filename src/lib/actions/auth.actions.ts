@@ -8,6 +8,19 @@ import { userTable } from "../schema/drizzle/drizzle.schema";
 import { getUser, lucia } from "../auth";
 import { cookies } from "next/headers";
 import { eq } from "drizzle-orm";
+import { MergeSchema } from "../schema/zod/merge.schema";
+
+export const recruitAction = async (values: z.infer<typeof MergeSchema>) => {
+    console.log(values);
+
+    const status = SignUpSchema.safeParse(values);
+    if (!status.success) {
+        return { error: "Invalid Fields" };
+    }
+    console.log("Im Called");
+    console.log(values);
+    return { success: "Called Success" };
+};
 
 export const signUp = async (values: z.infer<typeof SignUpSchema>) => {
     const status = SignUpSchema.safeParse(values);
