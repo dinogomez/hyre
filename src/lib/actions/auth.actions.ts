@@ -9,16 +9,22 @@ import { getUser, lucia } from "../auth";
 import { cookies } from "next/headers";
 import { eq } from "drizzle-orm";
 import { MergeSchema } from "../schema/zod/merge.schema";
+import { createClient } from "@supabase/supabase-js";
+import supabase from "../db/supabase";
 
 export const recruitAction = async (values: z.infer<typeof MergeSchema>) => {
-    console.log(values);
-
-    const status = SignUpSchema.safeParse(values);
+    const status = MergeSchema.safeParse(values);
     if (!status.success) {
+        console.log("Status:", status.error.message);
         return { error: "Invalid Fields" };
     }
-    console.log("Im Called");
-    console.log(values);
+
+    const { data, error } = await supabase.storage
+        .from("logo")
+        .upload(values.userId + "/" + values.companyName, values.companyLogo);
+    if (error) {
+        console.log(error);
+    }
     return { success: "Called Success" };
 };
 

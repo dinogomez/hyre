@@ -56,13 +56,19 @@ export const MergeSchema = z.object({
         .refine((value) => value.some((item) => item), {
             message: "You have to select at least one industry.",
         }),
-    companyLogo: z
-        .custom<File>((val) => val instanceof File, "Company logo is required.")
-        .refine((file) => file.size <= MAX_FILE_SIZE, `Max file size is 5mb`)
-        .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), {
-            message: "Please choose a supported format.",
-        })
-        .or(z.string()),
+    companyLogo: z.union([
+        z.string(),
+        z
+            .any()
+            .refine((val) => val instanceof File, "Company logo is required.")
+            .refine(
+                (file) => file.size <= MAX_FILE_SIZE,
+                `Max file size is 5mb`
+            )
+            .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), {
+                message: "Please choose a supported format.",
+            }),
+    ]),
 
     numEmployee: z.string().min(1, "Number of employees is required"),
     userId: z.string().optional(),

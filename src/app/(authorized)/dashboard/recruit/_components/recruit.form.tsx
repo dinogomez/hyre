@@ -159,10 +159,6 @@ export default function RecruitForm() {
         }
     };
 
-    useEffect(() => {
-        loadAllProvinces();
-    }, []);
-
     const form = useForm<z.infer<typeof MergeSchema>>({
         resolver: zodResolver(MergeSchema),
         mode: "onChange",
@@ -216,6 +212,20 @@ export default function RecruitForm() {
             form.trigger("skills");
         }
     }, [skillTags, form]);
+
+    useEffect(() => {
+        if (useEmail) {
+            form.setValue("primaryEmail", user!.email);
+        }
+    }, [useEmail, form]);
+
+    useEffect(() => {
+        form.setValue("companyLogo", imageBase64);
+    }, [imageBase64]);
+
+    useEffect(() => {
+        loadAllProvinces();
+    }, []);
 
     type FieldName = keyof Inputs;
     const processForm: SubmitHandler<Inputs> = async (data) => {
@@ -334,7 +344,14 @@ export default function RecruitForm() {
 
                                 <Image
                                     priority
-                                    src={imagePreviewUrl ?? "/200x200.svg"}
+                                    src={
+                                        form.getFieldState("companyLogo")
+                                            .invalid
+                                            ? "/200x200.svg"
+                                            : imagePreviewUrl
+                                              ? imagePreviewUrl
+                                              : "/200x200.svg"
+                                    }
                                     className="h-32 w-32 rounded-md border border-input bg-background p-1"
                                     width={128}
                                     height={128}
