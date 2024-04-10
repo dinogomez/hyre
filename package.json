@@ -54,6 +54,7 @@
         "@tiptap/react": "^2.2.4",
         "@tiptap/starter-kit": "^2.2.4",
         "@types/uuid": "^9.0.8",
+        "base64-arraybuffer": "^1.0.2",
         "class-variance-authority": "^0.7.0",
         "clsx": "^2.1.0",
         "cmdk": "0.2.1",

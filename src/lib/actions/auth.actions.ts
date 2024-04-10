@@ -11,6 +11,7 @@ import { eq } from "drizzle-orm";
 import { MergeSchema } from "../schema/zod/merge.schema";
 import { createClient } from "@supabase/supabase-js";
 import supabase from "../db/supabase";
+import Base64Binary from "../util/base64";
 
 export const recruitAction = async (values: z.infer<typeof MergeSchema>) => {
     const status = MergeSchema.safeParse(values);
@@ -19,9 +20,23 @@ export const recruitAction = async (values: z.infer<typeof MergeSchema>) => {
         return { error: "Invalid Fields" };
     }
 
+    const image = values.companyLogo as string;
+
+    const ext = image.substring("data:image/".length, image.indexOf(";base64"));
+
+    const imageBase64Str = image.replace(/^.+,/, "");
+
+    const buf = Buffer.from(imageBase64Str, "base64");
+
+    const logoKey = `${values.companyName}/logo.${ext}`;
+
     const { data, error } = await supabase.storage
-        .from("logo")
-        .upload(values.userId + "/" + values.companyName, values.companyLogo);
+        .from("avatars")
+        .upload(logoKey, buf, {
+            contentType: `image/${ext}`,
+            upsert: true,
+        });
+
     if (error) {
         console.log(error);
     }
