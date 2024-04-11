@@ -55,33 +55,33 @@ const steps = [
         id: "Step 1",
         name: "Company Information",
         fields: [
-            "companyName",
-            "companyLogo",
-            "companyDesc",
-            "industry",
-            "companyEmail",
-            "website",
-            "province",
-            "city",
-            "barangay",
-            "numEmployee",
+            "company_Name",
+            "company_Logo",
+            "company_Desc",
+            "company_Industry",
+            "company_Email",
+            "company_Website",
+            "company_Province",
+            "company_City",
+            "company_Barangay",
+            "company_NumEmployee",
         ],
     },
     {
         id: "Step 2",
         name: "Create a Job",
         fields: [
-            "jobTitle",
-            "jobDesc",
-            "jobType",
-            "workArrangement",
-            "yearsExp",
-            "skills",
-            "jProvince",
-            "jCity",
-            "jBarangay",
-            "primaryEmail",
-            "redirectUrl",
+            "job_Title",
+            "job_Desc",
+            "job_Type",
+            "job_WorkArrangement",
+            "job_YearsExp",
+            "job_Skills",
+            "job_Province",
+            "job_City",
+            "job_Barangay",
+            "job_PrimaryEmail",
+            "job_RedirectUrl",
         ],
     },
     { id: "Step 3", name: "Complete" },
@@ -159,64 +159,64 @@ export default function RecruitForm() {
         resolver: zodResolver(MergeSchema),
         mode: "onChange",
         defaultValues: {
-            companyName: "",
-            companyDesc: "",
-            companyEmail: "",
-            companyLogo: "",
-            website: "",
-            province: "",
-            city: "",
-            barangay: "",
-            industry: [],
-            numEmployee: "",
-            jobTitle: "",
-            jobDesc: "",
-            skills: [],
-            jobType: "Full-Time",
-            workArrangement: "Hybrid",
-            primaryEmail: "",
-            secondaryEmail: "",
-            jProvince: "",
-            jCity: "",
-            jBarangay: "",
-            redirectUrl: "",
+            company_Name: "",
+            company_Desc: "",
+            company_Email: "",
+            company_Logo: "",
+            company_Website: "",
+            company_Province: "",
+            company_City: "",
+            company_Barangay: "",
+            company_Industry: [],
+            company_NumEmployee: "",
+            job_Title: "",
+            job_Desc: "",
+            job_Skills: [],
+            job_Type: "Full-Time",
+            job_WorkArrangement: "Hybrid",
+            job_PrimaryEmail: "",
+            job_SecondaryEmail: "",
+            job_Province: "",
+            job_City: "",
+            job_Barangay: "",
+            job_RedirectUrl: "",
             userId: user?.id,
         },
     });
     const { reset, trigger, handleSubmit } = form;
 
-    form.register("industry", {
+    form.register("company_Industry", {
         value: industryTags.map((tag) => tag.text),
     });
 
-    form.register("skills", {
+    form.register("job_Skills", {
         value: skillTags.map((tag) => tag.text),
     });
 
     useEffect(() => {
         const industryValues = industryTags.map((tag) => tag.text);
-        form.setValue("industry", industryValues);
+        form.setValue("company_Industry", industryValues);
         if (industryTags.length > 0) {
-            form.trigger("industry");
+            form.trigger("company_Industry");
         }
     }, [industryTags, form]);
 
     useEffect(() => {
         const skillsValues = skillTags.map((tag) => tag.text);
-        form.setValue("skills", skillsValues);
+        form.setValue("job_Skills", skillsValues);
         if (skillTags.length > 0) {
-            form.trigger("skills");
+            form.trigger("job_Skills");
         }
     }, [skillTags, form]);
 
     useEffect(() => {
         if (useEmail) {
-            form.setValue("primaryEmail", user!.email);
+            form.setValue("job_PrimaryEmail", user!.email);
         }
     }, [useEmail, form]);
 
     useEffect(() => {
-        form.setValue("companyLogo", imageBase64);
+        form.setValue("company_Logo", imageBase64);
     }, [imageBase64]);
 
     useEffect(() => {
@@ -341,7 +341,7 @@ export default function RecruitForm() {
                                 <Image
                                     priority
                                     src={
-                                        form.getFieldState("companyLogo")
+                                        form.getFieldState("company_Logo")
                                             .invalid
                                             ? "/200x200.svg"
                                             : imagePreviewUrl
@@ -359,7 +359,7 @@ export default function RecruitForm() {
                                 <div className="sm:col-span-3">
                                     <FormField
                                         control={form.control}
-                                        name="companyName"
+                                        name="company_Name"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel required={true}>
@@ -384,7 +384,7 @@ export default function RecruitForm() {
                                 <div className="sm:col-span-3">
                                     <FormField
                                         control={form.control}
-                                        name="companyLogo"
+                                        name="company_Logo"
                                         render={({
                                             field: {
                                                 value,
@@ -429,7 +429,7 @@ export default function RecruitForm() {
                                 <div className="sm:col-span-6">
                                     <FormField
                                         control={form.control}
-                                        name="companyDesc"
+                                        name="company_Desc"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel required={true}>
@@ -453,7 +453,7 @@ export default function RecruitForm() {
                                 <div className="sm:col-span-6">
                                     <FormField
                                         control={form.control}
-                                        name="industry"
+                                        name="company_Industry"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel required={true}>
@@ -494,7 +494,7 @@ export default function RecruitForm() {
                                 <div className="sm:col-span-3">
                                     <FormField
                                         control={form.control}
-                                        name="companyEmail"
+                                        name="company_Email"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel required={true}>
@@ -516,7 +516,7 @@ export default function RecruitForm() {
                                 <div className="sm:col-span-3">
                                     <FormField
                                         control={form.control}
-                                        name="website"
+                                        name="company_Website"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>Website</FormLabel>
@@ -535,7 +535,7 @@ export default function RecruitForm() {
                                 <div className="sm:col-span-6">
                                     <FormField
                                         control={form.control}
-                                        name="numEmployee"
+                                        name="company_NumEmployee"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel required={true}>
@@ -599,7 +599,7 @@ export default function RecruitForm() {
                                 <div className="sm:col-span-6">
                                     <FormField
                                         control={form.control}
-                                        name="province"
+                                        name="company_Province"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel required={true}>
@@ -609,7 +609,7 @@ export default function RecruitForm() {
                                                     onValueChange={(value) => {
                                                         field.onChange(value);
                                                         form.setValue(
-                                                            "province",
+                                                            "company_Province",
                                                             provinceData.find(
                                                                 (
                                                                     item: Province
@@ -663,7 +663,7 @@ export default function RecruitForm() {
                                 <div className="sm:col-span-3">
                                     <FormField
                                         control={form.control}
-                                        name="city"
+                                        name="company_City"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel required={true}>
@@ -673,7 +673,7 @@ export default function RecruitForm() {
                                                     onValueChange={(value) => {
                                                         field.onChange(value);
                                                         form.setValue(
-                                                            "city",
+                                                            "company_City",
                                                             cityData.find(
                                                                 (item: City) =>
                                                                     item.city_code ===
@@ -685,7 +685,7 @@ export default function RecruitForm() {
                                                     defaultValue={field.value}
                                                     disabled={
                                                         !form.getValues(
-                                                            "province"
+                                                            "company_Province"
                                                         )
                                                     }
                                                 >
@@ -730,7 +730,7 @@ export default function RecruitForm() {
                                 <div className="sm:col-span-3">
                                     <FormField
                                         control={form.control}
-                                        name="barangay"
+                                        name="company_Barangay"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel optional={true}>
@@ -740,7 +740,7 @@ export default function RecruitForm() {
                                                     onValueChange={(value) => {
                                                         field.onChange(value);
                                                         form.setValue(
-                                                            "barangay",
+                                                            "company_Barangay",
                                                             barangayData.find(
                                                                 (
                                                                     item: Barangay
@@ -752,7 +752,9 @@ export default function RecruitForm() {
                                                     }}
                                                     defaultValue={field.value}
                                                     disabled={
-                                                        !form.getValues("city")
+                                                        !form.getValues(
+                                                            "company_City"
+                                                        )
                                                     }
                                                 >
                                                     <FormControl>
@@ -821,7 +823,7 @@ export default function RecruitForm() {
                                 <div className="sm:col-span-6">
                                     <FormField
                                         control={form.control}
-                                        name="jobTitle"
+                                        name="job_Title"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel required={true}>
@@ -845,7 +847,7 @@ export default function RecruitForm() {
                                 <div className="sm:col-span-6">
                                     <FormField
                                         control={form.control}
-                                        name="jobDesc"
+                                        name="job_Desc"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel required={true}>
@@ -871,7 +873,7 @@ export default function RecruitForm() {
                                 <div className="sm:col-span-6">
                                     <FormField
                                         control={form.control}
-                                        name="skills"
+                                        name="job_Skills"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel required={true}>
@@ -913,7 +915,7 @@ export default function RecruitForm() {
                                 <div className="sm:col-span-6">
                                     <FormField
                                         control={form.control}
-                                        name="yearsExp"
+                                        name="job_YearsExp"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel required={true}>
@@ -964,7 +966,7 @@ export default function RecruitForm() {
                                 <div className="sm:col-span-3">
                                     <FormField
                                         control={form.control}
-                                        name="jobType"
+                                        name="job_Type"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel required={true}>
@@ -1011,7 +1013,7 @@ export default function RecruitForm() {
                                 <div className="sm:col-span-3">
                                     <FormField
                                         control={form.control}
-                                        name="workArrangement"
+                                        name="job_WorkArrangement"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel required={true}>
@@ -1073,7 +1075,7 @@ export default function RecruitForm() {
                                 <div className="sm:col-span-3">
                                     <FormField
                                         control={form.control}
-                                        name="primaryEmail"
+                                        name="job_PrimaryEmail"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel required={true}>
@@ -1126,7 +1128,7 @@ export default function RecruitForm() {
                                 <div className="sm:col-span-3">
                                     <FormField
                                         control={form.control}
-                                        name="secondaryEmail"
+                                        name="job_SecondaryEmail"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>
@@ -1152,7 +1154,7 @@ export default function RecruitForm() {
                                 <div className="sm:col-span-6">
                                     <FormField
                                         control={form.control}
-                                        name="redirectUrl"
+                                        name="job_RedirectUrl"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>Job Page</FormLabel>
@@ -1188,7 +1190,7 @@ export default function RecruitForm() {
                                 <div className="sm:col-span-6">
                                     <FormField
                                         control={form.control}
-                                        name="jProvince"
+                                        name="job_Province"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel required={true}>
@@ -1198,7 +1200,7 @@ export default function RecruitForm() {
                                                     onValueChange={(value) => {
                                                         field.onChange(value);
                                                         form.setValue(
-                                                            "jProvince",
+                                                            "job_Province",
                                                             provinceData.find(
                                                                 (
                                                                     item: Province
@@ -1252,7 +1254,7 @@ export default function RecruitForm() {
                                 <div className="sm:col-span-3">
                                     <FormField
                                         control={form.control}
-                                        name="jCity"
+                                        name="job_City"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel required={true}>
@@ -1262,7 +1264,7 @@ export default function RecruitForm() {
                                                     onValueChange={(value) => {
                                                         field.onChange(value);
                                                         form.setValue(
-                                                            "jCity",
+                                                            "job_City",
                                                             jcityData.find(
                                                                 (item: City) =>
                                                                     item.city_code ===
@@ -1274,7 +1276,7 @@ export default function RecruitForm() {
                                                     defaultValue={field.value}
                                                     disabled={
                                                         !form.getValues(
-                                                            "jProvince"
+                                                            "job_Province"
                                                         )
                                                     }
                                                 >
@@ -1319,7 +1321,7 @@ export default function RecruitForm() {
                                 <div className="sm:col-span-3">
                                     <FormField
                                         control={form.control}
-                                        name="jBarangay"
+                                        name="job_Barangay"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel optional={true}>
@@ -1329,7 +1331,7 @@ export default function RecruitForm() {
                                                     onValueChange={(value) => {
                                                         field.onChange(value);
                                                         form.setValue(
-                                                            "jBarangay",
+                                                            "job_Barangay",
                                                             jbarangayData.find(
                                                                 (
                                                                     item: Barangay
@@ -1341,7 +1343,9 @@ export default function RecruitForm() {
                                                     }}
                                                     defaultValue={field.value}
                                                     disabled={
-                                                        !form.getValues("jCity")
+                                                        !form.getValues(
+                                                            "job_City"
+                                                        )
                                                     }
                                                 >
                                                     <FormControl>

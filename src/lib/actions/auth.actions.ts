@@ -4,41 +4,68 @@ import { SignInSchema, SignUpSchema } from "../schema/zod/signup.schema";
 import { Argon2id } from "oslo/password";
 import { generateId } from "lucia";
 import db from "../db";
-import { userTable } from "../schema/drizzle/drizzle.schema";
+import { companyTable, userTable } from "../schema/drizzle/drizzle.schema";
 import { getUser, lucia } from "../auth";
 import { cookies } from "next/headers";
 import { eq } from "drizzle-orm";
 import { MergeSchema } from "../schema/zod/merge.schema";
 import supabase from "../db/supabase";
+import { convertBase64ToBuffer, getImageExtension } from "../utils";
 
 export const recruitAction = async (values: z.infer<typeof MergeSchema>) => {
     const status = MergeSchema.safeParse(values);
     if (!status.success) {
-        console.log("Status:", status.error.message);
-        return { error: "Invalid Fields" };
+        return { error: status.error.message };
     }
+    const {
+        company_Name,
+        company_Desc,
+        company_Email,
+        company_Website,
+        company_Province,
+        company_City,
+        company_Barangay,
+        company_Industry,
+        company_NumEmployee,
+        company_Logo,
+    } = values;
+    const logo = company_Logo as string;
+    const ext = getImageExtension(logo);
+    const buf = convertBase64ToBuffer(logo);
+    const logoKey = `${company_Name}/logo.${ext}`;
 
-    const image = values.companyLogo as string;
-
-    const ext = image.substring("data:image/".length, image.indexOf(";base64"));
-
-    const imageBase64Str = image.replace(/^.+,/, "");
-
-    const buf = Buffer.from(imageBase64Str, "base64");
-
-    const logoKey = `${values.companyName}/logo.${ext}`;
-
-    const { data, error } = await supabase.storage
+    const { data, error: uploadError } = await supabase.storage
         .from("avatars")
         .upload(logoKey, buf, {
             contentType: `image/${ext}`,
             upsert: true,
         });
 
-    if (error) {
-        console.log(error);
+    if (uploadError) {
+        return { error: uploadError.message };
     }
-    return { success: "Called Success" };
+    const companyId = generateId(15);
+
+    try {
+        await db.insert(companyTable).values({
+            id: companyId,
+            company_Name: company_Name,
+            company_Desc: company_Desc,
+            company_Email: company_Email,
+            company_Website: company_Website,
+            company_Province: company_Province,
+            company_City: company_City,
+            company_Barangay: company_Barangay,
+            company_Industry: company_Industry,
+            company_Logo: `avatars/${logoKey}`,
+            company_NumEmployee: company_NumEmployee,
+            userId: values.userId!,
+        });
+
+        return { success: "Company Insert Success" };
+    } catch (error: any) {
+        return { error: error.message };
+    }
 };
 
 export const signUp = async (values: z.infer<typeof SignUpSchema>) => {
