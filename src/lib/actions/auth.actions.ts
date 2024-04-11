@@ -9,9 +9,7 @@ import { getUser, lucia } from "../auth";
 import { cookies } from "next/headers";
 import { eq } from "drizzle-orm";
 import { MergeSchema } from "../schema/zod/merge.schema";
-import { createClient } from "@supabase/supabase-js";
 import supabase from "../db/supabase";
-import Base64Binary from "../util/base64";
 
 export const recruitAction = async (values: z.infer<typeof MergeSchema>) => {
     const status = MergeSchema.safeParse(values);

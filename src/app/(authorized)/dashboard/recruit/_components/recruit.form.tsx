@@ -28,9 +28,7 @@ import {
 import {
     Select,
     SelectContent,
-    SelectGroup,
     SelectItem,
-    SelectLabel,
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
@@ -38,10 +36,8 @@ import { Barangay, City, Province, Region } from "@/lib/types";
 import { numberOfEmployee } from "@/lib/data/data.number-employees";
 import { Tag, TagInput } from "@/components/ui/tag/tag-input";
 import { Markets } from "@/lib/data/data.markets";
-import { CompanySchema } from "@/lib/schema/zod/company.schema";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { JobSchema } from "@/lib/schema/zod/job.schema";
 import Tiptap from "@/components/tiptap/tiptap";
 import { jobTypeEnum, workArrangementEnum } from "@/lib/data/data.enum";
 import { Skills } from "@/lib/data/data.skills";
