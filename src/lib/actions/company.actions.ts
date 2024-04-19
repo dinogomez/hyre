@@ -1,7 +1,6 @@
 "use server";
 import { z } from "zod";
 import { CompanySchema } from "../schema/zod/company.schema";
-import { convertBase64ToBuffer, getImageExtension } from "../utils";
 import { companyTable } from "../schema/drizzle/drizzle.schema";
 import { generateId } from "lucia";
 import db from "../db";
