@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 import { User } from "lucia";
 import Logo from "@/components/logo";
 import DashboardHeaderSheet from "./dashboard.header-sheet";

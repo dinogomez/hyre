@@ -26,7 +26,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ExternalLink } from "lucide-react";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 
 type SignUpSchemaValues = z.infer<typeof SignUpSchema>;
 
