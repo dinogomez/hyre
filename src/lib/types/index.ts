@@ -3,6 +3,11 @@ export interface iObject {
     label: string;
 }
 
+export interface iObjectN {
+    id: number;
+    label: string;
+}
+
 export interface iObjectT {
     id: string;
     text: string;

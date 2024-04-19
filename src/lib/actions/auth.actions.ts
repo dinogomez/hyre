@@ -28,6 +28,7 @@ export const recruitAction = async (values: z.infer<typeof MergeSchema>) => {
         company_Industry,
         company_NumEmployee,
         company_Logo,
+        userId,
     } = values;
     const logo = company_Logo as string;
     const ext = getImageExtension(logo);

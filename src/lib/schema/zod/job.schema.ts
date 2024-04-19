@@ -13,6 +13,7 @@ export const JobSchema = z.object({
         }),
     }),
     job_YearsExp: z.string().min(1, "Years of experience is required."),
+
     job_Skills: z
         .array(z.string())
         .refine((value) => value.some((item) => item), {
@@ -35,4 +36,6 @@ export const JobSchema = z.object({
         .url("Please enter a valid https url.")
         .optional()
         .or(z.literal("")),
+    userId: z.string().optional(),
+    companyId: z.string().optional(),
 });

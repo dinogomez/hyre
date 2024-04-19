@@ -10,6 +10,6 @@ export const years: iObject[] = [
     { id: "6", label: "6+ Years of Experience" },
     { id: "7", label: "7+ Years of Experience" },
     { id: "8", label: "8+ Years of Experience" },
-    { id: "9", label: "9+ Years of Experience" },
+    { id: "0", label: "9+ Years of Experience" },
     { id: "10", label: "10+ Years of Experience" },
 ];

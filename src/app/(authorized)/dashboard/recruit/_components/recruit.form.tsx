@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
@@ -41,12 +41,12 @@ import { Textarea } from "@/components/ui/textarea";
 import Tiptap from "@/components/tiptap/tiptap";
 import { jobTypeEnum, workArrangementEnum } from "@/lib/data/data.enum";
 import { Skills } from "@/lib/data/data.skills";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, XCircleIcon, Loader } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useSession } from "@/components/provider/session-provider";
 import { MergeSchema } from "@/lib/schema/zod/merge.schema";
 import { years } from "@/lib/data/data.years";
-import { recruitAction } from "@/lib/actions/auth.actions";
+import { recruitAction } from "@/lib/actions/recruit.actions";
 
 type Inputs = z.infer<typeof MergeSchema>;
 
@@ -106,6 +106,10 @@ export default function RecruitForm() {
     const [skillTags, setSkillTags] = useState<Tag[]>([]);
 
     const [useEmail, setUseEmail] = useState(false);
+
+    const [error, setError] = useState<string | undefined>("");
+    const [success, setSuccess] = useState<string | undefined>("");
+    const [isPending, startTransition] = useTransition();
 
     const delta = currentStep - previousStep;
 
@@ -225,9 +229,17 @@ export default function RecruitForm() {
 
     type FieldName = keyof Inputs;
     const processForm: SubmitHandler<Inputs> = async (data) => {
-        const res = await recruitAction(data);
-        console.log(res);
-        reset();
+        setError("");
+        setSuccess("");
+        startTransition(() => {
+            recruitAction(data).then((data) => {
+                if (data) {
+                    setError(data.error);
+                    setSuccess(data.success);
+                }
+            });
+            reset();
+        });
     };
     const next = async () => {
         const fields = steps[currentStep].fields;
@@ -1390,65 +1402,97 @@ export default function RecruitForm() {
                     )}
 
                     {currentStep === 2 && (
-                        <motion.div
-                            className="text-centerl container flex w-full flex-col items-center justify-center gap-y-4"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{
-                                opacity: 1,
-                                y: 0,
-                                transition: {
-                                    duration: 0.5,
-                                    ease: "easeInOut",
-                                    staggerChildren: 0.2,
-                                },
-                            }}
-                        >
-                            <motion.div
-                                initial={{ scale: 0, opacity: 0 }}
-                                animate={{
-                                    scale: 1,
-                                    opacity: 1,
-                                    transition: {
-                                        duration: 0.3,
-                                        ease: "easeInOut",
-                                    },
-                                }}
-                                className="my-4"
-                            >
-                                <CheckCircle2 className="h-20 w-20 fill-green-500 text-white" />
-                            </motion.div>
-                            <motion.h2
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{
-                                    opacity: 1,
-                                    y: 0,
-                                    transition: {
-                                        duration: 0.5,
-                                        ease: "easeInOut",
-                                    },
-                                }}
-                                className="text-5xl font-black leading-7 text-gray-900"
-                            >
-                                Posting Complete
-                            </motion.h2>
-                            <motion.p
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{
-                                    opacity: 1,
-                                    y: 0,
-                                    transition: {
-                                        duration: 0.5,
-                                        ease: "easeInOut",
-                                    },
-                                }}
-                                className="mt-1 text-sm leading-6 text-gray-600"
-                            >
-                                Thank you for your submission.
-                            </motion.p>
-                            <Link href="/dashboard">
-                                <Button variant="outline">Return</Button>
-                            </Link>
-                        </motion.div>
+                        <>
+                            {isPending ? (
+                                <div className="flex h-full w-full items-center justify-center">
+                                    <Loader className="h-24 w-24 animate-spin text-neutral-300" />
+                                </div>
+                            ) : (
+                                <motion.div
+                                    className="container flex w-full flex-col items-center justify-center gap-y-4 text-center"
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{
+                                        opacity: 1,
+                                        y: 0,
+                                        transition: {
+                                            duration: 0.5,
+                                            ease: "easeInOut",
+                                            staggerChildren: 0.2,
+                                        },
+                                    }}
+                                >
+                                    <motion.div
+                                        initial={{ scale: 0, opacity: 0 }}
+                                        animate={{
+                                            scale: 1,
+                                            opacity: 1,
+                                            transition: {
+                                                duration: 0.3,
+                                                ease: "easeInOut",
+                                            },
+                                        }}
+                                        className="my-4"
+                                    >
+                                        {success && (
+                                            <CheckCircle2 className="h-20 w-20 fill-green-500 text-white" />
+                                        )}
+                                        {error && (
+                                            <XCircleIcon className="fill-red-500-500 h-20 w-20 text-white" />
+                                        )}
+                                    </motion.div>
+                                    <motion.h2
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{
+                                            opacity: 1,
+                                            y: 0,
+                                            transition: {
+                                                duration: 0.5,
+                                                ease: "easeInOut",
+                                            },
+                                        }}
+                                        className="text-5xl font-black leading-7"
+                                    >
+                                        Posting Complete!
+                                    </motion.h2>
+                                    <motion.p
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{
+                                            opacity: 1,
+                                            y: 0,
+                                            transition: {
+                                                duration: 0.5,
+                                                ease: "easeInOut",
+                                            },
+                                        }}
+                                        className="mt-1 text-xs leading-6 text-gray-600"
+                                    >
+                                        {success ? success : error}
+                                    </motion.p>
+
+                                    <motion.p
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{
+                                            opacity: 1,
+                                            y: 0,
+                                            transition: {
+                                                duration: 0.5,
+                                                ease: "easeInOut",
+                                            },
+                                        }}
+                                        className="mt-1 text-sm leading-6 text-gray-600"
+                                    >
+                                        {success
+                                            ? "Thank you for your submission."
+                                            : "Please try again"}
+                                    </motion.p>
+                                    <Link href="/dashboard">
+                                        <Button variant="outline">
+                                            Return
+                                        </Button>
+                                    </Link>
+                                </motion.div>
+                            )}
+                        </>
                     )}
                 </form>
             </Form>
