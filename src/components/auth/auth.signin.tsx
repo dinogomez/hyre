@@ -29,7 +29,7 @@ import { AlertTriangleIcon, Eye, EyeOff } from "lucide-react";
 import { useState, useTransition } from "react";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "../ui/checkbox";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 
 type SignInSchemaValues = z.infer<typeof SignInSchema>;
 

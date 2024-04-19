@@ -4,6 +4,7 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import Provider from "@/components/provider/provider";
 import { Toaster } from "@/components/ui/toaster";
+import { ViewTransitions } from "next-view-transitions";
 
 export const metadata: Metadata = {
     title: "Hyre",
@@ -19,17 +20,19 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
-            <body
-                className={`${GeistSans.variable} ${GeistMono.variable} w-screen overflow-x-hidden font-sans`}
-            >
-                <Provider>
-                    <div>
-                        {children}
-                        <Toaster />
-                    </div>
-                </Provider>
-            </body>
-        </html>
+        <ViewTransitions>
+            <html lang="en">
+                <body
+                    className={`${GeistSans.variable} ${GeistMono.variable} w-screen overflow-x-hidden font-sans`}
+                >
+                    <Provider>
+                        <div>
+                            {children}
+                            <Toaster />
+                        </div>
+                    </Provider>
+                </body>
+            </html>
+        </ViewTransitions>
     );
 }
