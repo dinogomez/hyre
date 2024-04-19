@@ -3,8 +3,6 @@
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Toolbar } from "./toolbar";
-import BulletList from "@tiptap/extension-bullet-list";
-import Heading from "@tiptap/extension-heading";
 import Underline from "@tiptap/extension-underline";
 import { useEffect, useState } from "react";
 export default function Tiptap({

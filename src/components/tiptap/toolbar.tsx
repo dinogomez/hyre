@@ -7,7 +7,6 @@ import {
     Italic,
     List,
     ListOrdered,
-    Heading2,
     Minus,
     Underline,
     HelpCircle,

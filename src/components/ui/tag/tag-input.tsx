@@ -4,7 +4,6 @@ import React from "react";
 import { Input } from "../input";
 import { Button } from "../button";
 import { type VariantProps } from "class-variance-authority";
-import { CommandInput } from "@/components/ui/command";
 import { toast } from "../use-toast";
 import { TagPopover } from "./tag-popover";
 import { TagList } from "./tag-list";

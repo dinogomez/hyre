@@ -28,3 +28,17 @@ export const getFullName = ({
 
     return `${capitalizedFirstName} ${capitalizedLastName}`;
 };
+
+export const getImageExtension = (imageData: string): string => {
+    return imageData.substring(
+        "data:image/".length,
+        imageData.indexOf(";base64")
+    );
+};
+
+export const convertBase64ToBuffer = (base64String: string): Buffer => {
+    return Buffer.from(base64String.replace(/^.+,/, ""), "base64");
+};
+
+export const getRemoteImage = (url: string) =>
+    `${process.env.NEXT_PUBLIC_SUPABASE_BUCKET_URL}/${url}`;
