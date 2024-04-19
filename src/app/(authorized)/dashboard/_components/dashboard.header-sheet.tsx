@@ -2,7 +2,7 @@ import React from "react";
 import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Link } from 'next-view-transitions';
+import { Link } from "next-view-transitions";
 import Logo from "@/components/logo";
 
 function DashboardHeaderSheet() {
