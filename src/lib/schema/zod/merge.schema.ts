@@ -1,4 +1,3 @@
-import { jobTypeEnum, workArrangementEnum } from "@/lib/data/data.enum";
 import { z } from "zod";
 import { CompanySchema } from "./company.schema";
 import { JobSchema } from "./job.schema";

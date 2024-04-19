@@ -1,4 +1,4 @@
-import { integer, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import {
     jobTypeEnum as jte,
