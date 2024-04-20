@@ -1,14 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    reactStrictMode: true,
     webpack: (config) => {
         config.externals.push("@node-rs/argon2", "@node-rs/bcrypt");
         return config;
     },
     images: {
-        // We disable image optimisation during static export builds
         dangerouslyAllowSVG: true,
         remotePatterns: [
-         
           {
             protocol: 'https',
             hostname: 'dfepvtbxjabxgopadrjb.supabase.co',
@@ -18,5 +17,4 @@ const nextConfig = {
         ],
       },
 };
-
 export default nextConfig;
