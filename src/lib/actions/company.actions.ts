@@ -1,10 +1,11 @@
 "use server";
 import { z } from "zod";
 import { CompanySchema } from "../schema/zod/company.schema";
-import { companyTable } from "../schema/drizzle/drizzle.schema";
+import { companyTable, jobTable } from "../schema/drizzle/drizzle.schema";
 import { generateId } from "lucia";
 import db from "../db";
 import supabase from "../db/supabase";
+import { eq } from "drizzle-orm";
 
 export const createCompanyAction = async (
     values: z.infer<typeof CompanySchema>
@@ -68,5 +69,19 @@ export const createCompanyAction = async (
         };
     } catch (error: any) {
         return { error: "There was a problem creating the Company." };
+    }
+};
+
+export const getCompaniesLJJobs = async () => {
+    console.log("fetching jobs");
+    try {
+        const data = await db
+            .select()
+            .from(companyTable)
+            .leftJoin(jobTable, eq(companyTable.id, jobTable.companyId));
+        console.log(data);
+        return { success: data };
+    } catch (error) {
+        return { error: "Could not fetch jobs" };
     }
 };

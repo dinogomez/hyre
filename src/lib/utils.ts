@@ -1,8 +1,17 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { iObject } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
+}
+
+export function getLabelById(
+    objects: iObject[],
+    id: string
+): string | undefined {
+    const matchingObject = objects.find((obj) => obj.id === id);
+    return matchingObject ? matchingObject.label : undefined;
 }
 export const getInitials = (fullName: string) => {
     const initials = fullName
@@ -10,6 +19,11 @@ export const getInitials = (fullName: string) => {
         .map((name) => name.charAt(0).toUpperCase())
         .join("");
     return initials.slice(0, 2); // Return only the first two initials
+};
+
+export const getFirstSentence = (paragraph: string) => {
+    const index = paragraph.indexOf(".");
+    return index !== -1 ? paragraph.substring(0, index + 1).trim() : paragraph;
 };
 
 export const getFullName = ({
