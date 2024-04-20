@@ -1,7 +1,7 @@
 "use server";
 import { generateId } from "lucia";
 import db from "../db";
-import { jobTable } from "../schema/drizzle/drizzle.schema";
+import { companyTable, jobTable } from "../schema/drizzle/drizzle.schema";
 import { JobSchema } from "../schema/zod/job.schema";
 import { z } from "zod";
 
