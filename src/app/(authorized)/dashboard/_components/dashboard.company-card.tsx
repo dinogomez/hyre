@@ -7,6 +7,7 @@ import {
     getRemoteImage,
     getFirstSentence,
     getLabelById,
+    getTimeDifference,
 } from "@/lib/utils";
 import Image from "next/image";
 import { numberOfEmployee } from "@/lib/data/data.number-employees";
@@ -29,7 +30,7 @@ function DashboardCompanyCard({ company, job }: DashboardCompanyCardProps) {
                             ? getRemoteImage(company.company_Logo)
                             : "/200x200.svg"
                     }
-                    className="h-12 w-12 rounded-sm border border-input bg-background "
+                    className="h-12 w-12 rounded-sm  bg-background "
                     width={128}
                     height={128}
                     alt="Logo"
@@ -58,27 +59,28 @@ function DashboardCompanyCard({ company, job }: DashboardCompanyCardProps) {
                     <ChevronRight className="h-5 w-5 text-gray-400" />
                 </div>
             </div>
-            <div className="mt-4 border p-4">
+            <div className="mt-4 rounded-md border p-4">
                 <div className="flex items-center justify-between">
                     <div>
                         <h3 className="font-semibold">{job?.job_Title}</h3>
                         <p className="text-sm text-gray-500">
-                            Bengaluru · {job?.job_WorkArrangement} · ₹3L – ₹5L
+                            {job?.job_Province}, {job?.job_City} ·{" "}
+                            {job?.job_WorkArrangement} · ₹3L – ₹5L
                         </p>
                     </div>
                     <div className="flex items-center space-x-2">
                         <Badge>RECRUITER RECENTLY ACTIVE</Badge>
                         <span className="text-sm text-gray-500">
-                            POSTED 1 DAY AGO
+                            {getTimeDifference(job!.createdAt)}
                         </span>
                     </div>
                 </div>
-                <div className="mt-4 flex space-x-2">
+                {/* <div className="mt-4 flex justify-end space-x-2">
                     <Button variant="outline">Save</Button>
                     <Button>Learn more</Button>
-                </div>
+                </div> */}
             </div>
-            <div className="mt-4 flex items-center justify-between">
+            {/* <div className="mt-4 flex items-center justify-between">
                 <div className="flex space-x-4">
                     <Button className="text-gray-500" variant="ghost">
                         Report
@@ -90,7 +92,7 @@ function DashboardCompanyCard({ company, job }: DashboardCompanyCardProps) {
                 <div className="flex items-center space-x-2">
                     <ChevronRight className="h-5 w-5 text-gray-400" />
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 }

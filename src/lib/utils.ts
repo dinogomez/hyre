@@ -54,5 +54,28 @@ export const convertBase64ToBuffer = (base64String: string): Buffer => {
     return Buffer.from(base64String.replace(/^.+,/, ""), "base64");
 };
 
+export const getTimeDifference = (timestamp: Date) => {
+    const currentTime = new Date();
+    const timeDifference = currentTime.getTime() - timestamp.getTime();
+    const seconds = Math.floor(timeDifference / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+    const months = Math.floor(days / 30);
+    const years = Math.floor(months / 12);
+
+    if (seconds < 60) {
+        return "POSTED RECENTLY";
+    } else if (hours < 24) {
+        return `POSTED ${hours} HOUR${hours > 1 ? "S" : ""} AGO`;
+    } else if (days < 30) {
+        return `POSTED ${days} DAY${days > 1 ? "S" : ""} AGO`;
+    } else if (months < 12) {
+        return `POSTED ${months} MONTH${months > 1 ? "S" : ""} AGO`;
+    } else {
+        return `POSTED ${years} YEAR${years > 1 ? "S" : ""} AGO`;
+    }
+};
+
 export const getRemoteImage = (url: string) =>
     `${process.env.NEXT_PUBLIC_SUPABASE_BUCKET_URL}/${url}`;

@@ -10,6 +10,7 @@ import {
     jobTypeEnum as jte,
     workArrangementEnum as wae,
 } from "@/lib/data/data.enum";
+
 import * as schema from "@/lib/schema/drizzle/drizzle.schema";
 
 type Schema = typeof schema;
@@ -51,7 +52,9 @@ export const userTable = pgTable("user", {
 
 export const companyTable = pgTable("company", {
     id: text("id").primaryKey(),
-    createdAt: timestamp("createdAt").default(sql`CURRENT_TIMESTAMP`),
+    createdAt: timestamp("createdAt")
+        .default(sql`CURRENT_TIMESTAMP`)
+        .notNull(),
     company_Name: text("company_Name").notNull(),
     company_Desc: text("company_Desc").notNull(),
     company_Email: text("company_Email").unique(),
@@ -69,7 +72,9 @@ export const companyTable = pgTable("company", {
 
 export const jobTable = pgTable("job", {
     id: text("id").primaryKey(),
-    createdAt: timestamp("createdAt").default(sql`CURRENT_TIMESTAMP`),
+    createdAt: timestamp("createdAt")
+        .default(sql`CURRENT_TIMESTAMP`)
+        .notNull(),
     job_Title: text("job_Title").notNull(),
     job_Desc: text("job_Desc").notNull(),
     job_Type: jobTypeEnum("job_Type").notNull(),

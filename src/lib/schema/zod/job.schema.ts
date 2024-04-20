@@ -1,6 +1,22 @@
 import { jobTypeEnum, workArrangementEnum } from "@/lib/data/data.enum";
 import { z } from "zod";
 
+const SalaryRangeSchema = z.object({
+    salaryRangeMin: z.number().positive(),
+    salaryRangeMax: z
+        .number()
+        .positive()
+        .refine(
+            (salaryRangeMax) =>
+                salaryRangeMax.input >
+                salaryRangeMax.getSibling("salaryRangeMin").input,
+            {
+                message:
+                    "Salary range max must be greater than salary range min",
+                path: ["salaryRangeMax"],
+            }
+        ),
+});
 export const JobSchema = z.object({
     job_Title: z.string().min(1, "Job title is required"),
     job_Desc: z.string().min(1, "Job description is required"),
@@ -12,8 +28,17 @@ export const JobSchema = z.object({
             message: "Please select a work arrangement",
         }),
     }),
+    job_SalaryRange: z.object({
+        salaryRangeMin: z.number().positive(),
+        salaryRangeMax: z
+            .number()
+            .positive()
+            .refine((val, ctx) => val > ctx.parent.salaryRangeMin, {
+                message: "salaryRangeMax must be greater than salaryRangeMin",
+                path: ["salaryRangeMax"],
+            }),
+    }),
     job_YearsExp: z.string().min(1, "Years of experience is required."),
-
     job_Skills: z
         .array(z.string())
         .refine((value) => value.some((item) => item), {
