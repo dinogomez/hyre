@@ -17,6 +17,7 @@ export const createCompanyAction = async (
 
     const {
         company_Name,
+        company_Header,
         company_Desc,
         company_Email,
         company_Website,
@@ -49,6 +50,7 @@ export const createCompanyAction = async (
             .values({
                 id: companyId,
                 company_Name: company_Name,
+                company_Header: company_Header,
                 company_Desc: company_Desc,
                 company_Email: company_Email,
                 company_Website: company_Website,

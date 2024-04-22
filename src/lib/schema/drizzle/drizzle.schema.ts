@@ -1,4 +1,4 @@
-import { pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { integer, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import {
     BuildQueryResult,
     DBQueryConfig,
@@ -56,6 +56,7 @@ export const companyTable = pgTable("company", {
         .default(sql`CURRENT_TIMESTAMP`)
         .notNull(),
     company_Name: text("company_Name").notNull(),
+    company_Header: text("company_Header").notNull(),
     company_Desc: text("company_Desc").notNull(),
     company_Email: text("company_Email").unique(),
     company_Website: text("company_Website"),
@@ -81,6 +82,8 @@ export const jobTable = pgTable("job", {
     job_WorkArrangement: workArrangementEnum("job_WorkArrangement").notNull(),
     job_YearsExp: text("job_YearsExp").notNull(),
     job_Skills: text("job_Skills").array().notNull(),
+    job_SalaryMin: integer("job_SalaryMin").notNull(),
+    job_SalaryMax: integer("job_SalaryMax").notNull(),
     job_Province: text("job_Province").notNull(),
     job_City: text("job_City").notNull(),
     job_Barangay: text("job_Barangay"),

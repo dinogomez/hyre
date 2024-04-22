@@ -39,6 +39,7 @@ export const recruitAction = async (values: z.infer<typeof MergeSchema>) => {
     const companyResponse = await createCompanyAction({
         company_Name,
         company_Desc,
+        company_Header,
         company_Email,
         company_Website,
         company_Province,
@@ -62,6 +63,8 @@ export const recruitAction = async (values: z.infer<typeof MergeSchema>) => {
         job_Type,
         job_WorkArrangement,
         job_YearsExp,
+        job_SalaryMin,
+        job_SalaryMax,
         job_Skills,
         job_Province,
         job_City,

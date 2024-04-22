@@ -57,6 +57,7 @@ const steps = [
         fields: [
             "company_Name",
             "company_Logo",
+            "company_Header",
             "company_Desc",
             "company_Industry",
             "company_Email",
@@ -76,6 +77,8 @@ const steps = [
             "job_Type",
             "job_WorkArrangement",
             "job_YearsExp",
+            "job_SalaryMin",
+            "job_SalaryMax",
             "job_Skills",
             "job_Province",
             "job_City",
@@ -110,6 +113,9 @@ export default function RecruitForm() {
     const [error, setError] = useState<string | undefined>("");
     const [success, setSuccess] = useState<string | undefined>("");
     const [isPending, startTransition] = useTransition();
+
+    const [headerCount, setHeaderCount] = useState(0);
+    const [descCount, setDescCount] = useState(0);
 
     const delta = currentStep - previousStep;
 
@@ -164,6 +170,7 @@ export default function RecruitForm() {
         mode: "onChange",
         defaultValues: {
             company_Name: "",
+            company_Header: "",
             company_Desc: "",
             company_Email: "",
             company_Logo: "",
@@ -179,6 +186,8 @@ export default function RecruitForm() {
             job_Type: "Full-Time",
             job_WorkArrangement: "Hybrid",
             job_PrimaryEmail: "",
+            job_SalaryMin: 0,
+            job_SalaryMax: 1,
             job_SecondaryEmail: "",
             job_Province: "",
             job_City: "",
@@ -381,6 +390,7 @@ export default function RecruitForm() {
                                                     <Input
                                                         placeholder="Company Name"
                                                         type="text"
+                                                        maxLength={150}
                                                         {...field}
                                                     />
                                                 </FormControl>
@@ -441,21 +451,97 @@ export default function RecruitForm() {
                                 <div className="sm:col-span-6">
                                     <FormField
                                         control={form.control}
+                                        name="company_Header"
+                                        render={({
+                                            field: {
+                                                value,
+                                                onChange,
+                                                ...fieldProps
+                                            },
+                                        }) => (
+                                            <FormItem>
+                                                <FormLabel required={true}>
+                                                    Company Header
+                                                </FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        {...fieldProps}
+                                                        placeholder="Innovation and Creativity"
+                                                        type="text"
+                                                        maxLength={50}
+                                                        onChange={(e) => {
+                                                            setHeaderCount(
+                                                                e.target.value
+                                                                    .length
+                                                            );
+
+                                                            onChange(
+                                                                e.target
+                                                                    .value &&
+                                                                    e.target
+                                                                        .value
+                                                            );
+                                                        }}
+                                                    />
+                                                </FormControl>
+                                                <div className="flex justify-between">
+                                                    <FormDescription>
+                                                        A slogan or summary
+                                                        about your company.
+                                                    </FormDescription>
+                                                    <FormDescription>
+                                                        ({headerCount}/50)
+                                                    </FormDescription>
+                                                </div>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+
+                                <div className="sm:col-span-6">
+                                    <FormField
+                                        control={form.control}
                                         name="company_Desc"
-                                        render={({ field }) => (
+                                        render={({
+                                            field: {
+                                                value,
+                                                onChange,
+                                                ...fieldProps
+                                            },
+                                        }) => (
                                             <FormItem>
                                                 <FormLabel required={true}>
                                                     Company Description
                                                 </FormLabel>
                                                 <FormControl>
                                                     <Textarea
-                                                        placeholder="Describe your company"
-                                                        {...field}
+                                                        {...fieldProps}
+                                                        placeholder="A pioneering software company"
+                                                        maxLength={500}
+                                                        onChange={(e) => {
+                                                            setDescCount(
+                                                                e.target.value
+                                                                    .length
+                                                            );
+
+                                                            onChange(
+                                                                e.target
+                                                                    .value &&
+                                                                    e.target
+                                                                        .value
+                                                            );
+                                                        }}
                                                     />
                                                 </FormControl>
-                                                <FormDescription>
-                                                    What is your company about?
-                                                </FormDescription>
+                                                <div className="flex justify-between">
+                                                    <FormDescription>
+                                                        Describe your company
+                                                    </FormDescription>
+                                                    <FormDescription>
+                                                        ({descCount}/500)
+                                                    </FormDescription>
+                                                </div>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
@@ -975,6 +1061,55 @@ export default function RecruitForm() {
                                     />
                                 </div>
 
+                                <div className="sm:col-span-6">
+                                    <div className="flex items-center justify-between  ">
+                                        <div className="w-full ">
+                                            <FormField
+                                                control={form.control}
+                                                name="job_SalaryMin"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            Salary Range
+                                                        </FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                type="number"
+                                                                placeholder="Minimum"
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+                                        <div className="m-[10px] self-end  p-0 text-muted-foreground">
+                                            -
+                                        </div>
+
+                                        <div className="h-full w-full self-end ">
+                                            <FormField
+                                                control={form.control}
+                                                name="job_SalaryMax"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel></FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                type="number"
+                                                                placeholder="Maximum"
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div className="sm:col-span-3">
                                     <FormField
                                         control={form.control}
@@ -1452,7 +1587,9 @@ export default function RecruitForm() {
                                         }}
                                         className="text-5xl font-black leading-7"
                                     >
-                                        Posting Complete!
+                                        {success
+                                            ? "Posting Complete!"
+                                            : "Something went wrong."}
                                     </motion.h2>
                                     <motion.p
                                         initial={{ opacity: 0, y: 20 }}

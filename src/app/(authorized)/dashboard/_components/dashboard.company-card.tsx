@@ -71,7 +71,9 @@ function DashboardCompanyCard({ company, job }: DashboardCompanyCardProps) {
                     <div className="flex items-center space-x-2">
                         <Badge>RECRUITER RECENTLY ACTIVE</Badge>
                         <span className="text-sm text-gray-500">
-                            {getTimeDifference(job!.createdAt)}
+                            {job?.createdAt
+                                ? getTimeDifference(job.createdAt)
+                                : "POSTED A WHILE AGO"}
                         </span>
                     </div>
                 </div>

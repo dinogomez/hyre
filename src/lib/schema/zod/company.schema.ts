@@ -5,7 +5,14 @@ const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png"];
 
 export const CompanySchema = z.object({
     company_Name: z.string().min(1, "Company name is required"),
-    company_Desc: z.string().min(1, "Company description is required"),
+    company_Header: z
+        .string()
+        .min(1, "Company header is required")
+        .max(50, "Must be no more than 50 characters."),
+    company_Desc: z
+        .string()
+        .min(1, "Company description is required")
+        .max(500, "Must be no more than 500 characters."),
     company_Email: z
         .string()
         .min(1, "Company Email is required")
