@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { SessionProvider } from "./session-provider";
 import { getUser } from "@/lib/auth";
 import { ThemeProvider } from "./theme-provider";
+import { ViewTransitions } from "next-view-transitions";
 
 interface ProviderProps {
     children: ReactNode;

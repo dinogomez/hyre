@@ -1,7 +1,7 @@
 "use server";
 import { z } from "zod";
 import { CompanySchema } from "../schema/zod/company.schema";
-import { companyTable, jobTable } from "../schema/drizzle/drizzle.schema";
+import { company, job } from "../schema/drizzle/drizzle.schema";
 import { generateId } from "lucia";
 import db from "../db";
 import supabase from "../db/supabase";
@@ -46,7 +46,7 @@ export const createCompanyAction = async (
 
     try {
         const res = await db
-            .insert(companyTable)
+            .insert(company)
             .values({
                 id: companyId,
                 company_Name: company_Name,
@@ -63,7 +63,7 @@ export const createCompanyAction = async (
                 userId: values.userId!,
             })
             .returning({
-                id: companyTable.id,
+                id: company.id,
             });
         return {
             success: "Company created successfully",
@@ -77,10 +77,11 @@ export const createCompanyAction = async (
 export const getCompaniesLJJobs = async () => {
     console.log("fetching jobs");
     try {
-        const data = await db
-            .select()
-            .from(companyTable)
-            .leftJoin(jobTable, eq(companyTable.id, jobTable.companyId));
+        const data = await db.query.company.findMany({
+            with: {
+                jobs: true,
+            },
+        });
         console.log(data);
         return { success: data };
     } catch (error) {

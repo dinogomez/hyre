@@ -4,7 +4,7 @@ import { SignInSchema, SignUpSchema } from "../schema/zod/signup.schema";
 import { Argon2id } from "oslo/password";
 import { generateId } from "lucia";
 import db from "../db";
-import { companyTable, userTable } from "../schema/drizzle/drizzle.schema";
+import { company, user } from "../schema/drizzle/drizzle.schema";
 import { getUser, lucia } from "../auth";
 import { cookies } from "next/headers";
 import { eq } from "drizzle-orm";
@@ -48,7 +48,7 @@ export const recruitAction = async (values: z.infer<typeof MergeSchema>) => {
     const companyId = generateId(15);
 
     try {
-        await db.insert(companyTable).values({
+        await db.insert(company).values({
             id: companyId,
             company_Name: company_Name,
             company_Desc: company_Desc,
@@ -83,7 +83,7 @@ export const signUp = async (values: z.infer<typeof SignUpSchema>) => {
 
     try {
         await db
-            .insert(userTable)
+            .insert(user)
             .values({
                 id: userId,
                 password: hashedPassword,
@@ -91,8 +91,8 @@ export const signUp = async (values: z.infer<typeof SignUpSchema>) => {
                 ...iValues,
             })
             .returning({
-                id: userTable.id,
-                email: userTable.email,
+                id: user.id,
+                email: user.email,
             });
 
         const session = await lucia.createSession(userId, {
@@ -114,7 +114,7 @@ export const signUp = async (values: z.infer<typeof SignUpSchema>) => {
 };
 
 export const signIn = async (values: z.infer<typeof SignInSchema>) => {
-    const existUser = await db.query.userTable.findFirst({
+    const existUser = await db.query.user.findFirst({
         where: (table) => eq(table.email, values.email.toLocaleLowerCase()),
     });
 

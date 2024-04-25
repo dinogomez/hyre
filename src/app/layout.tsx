@@ -5,6 +5,8 @@ import { GeistMono } from "geist/font/mono";
 import Provider from "@/components/provider/provider";
 import { Toaster } from "@/components/ui/toaster";
 import { ViewTransitions } from "next-view-transitions";
+import { Suspense } from "react";
+import Loading from "./loading";
 
 export const metadata: Metadata = {
     title: "Hyre",
@@ -26,10 +28,12 @@ export default function RootLayout({
                     className={`${GeistSans.variable} ${GeistMono.variable} w-screen overflow-x-hidden font-sans`}
                 >
                     <Provider>
-                        <div>
-                            {children}
-                            <Toaster />
-                        </div>
+                        <Suspense fallback={<Loading />}>
+                            <div>
+                                {children}
+                                <Toaster />
+                            </div>
+                        </Suspense>
                     </Provider>
                 </body>
             </html>

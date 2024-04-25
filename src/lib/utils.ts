@@ -66,6 +66,8 @@ export const getTimeDifference = (timestamp: Date) => {
 
     if (seconds < 60) {
         return "POSTED RECENTLY";
+    } else if (minutes < 60 && minutes > 0) {
+        return `POSTED ${minutes} MINUTE${minutes > 1 ? "S" : ""} AGO`;
     } else if (hours < 24) {
         return `POSTED ${hours} HOUR${hours > 1 ? "S" : ""} AGO`;
     } else if (days < 30) {

@@ -1,7 +1,7 @@
 "use server";
 import { generateId } from "lucia";
 import db from "../db";
-import { companyTable, jobTable } from "../schema/drizzle/drizzle.schema";
+import { company, job } from "../schema/drizzle/drizzle.schema";
 import { JobSchema } from "../schema/zod/job.schema";
 import { z } from "zod";
 
@@ -37,7 +37,7 @@ export const createJobAction = async (
     const jobId = generateId(15);
 
     try {
-        await db.insert(jobTable).values({
+        await db.insert(job).values({
             id: jobId,
             job_Title: job_Title,
             job_Desc: job_Desc,

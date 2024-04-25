@@ -4,6 +4,7 @@ import {
     DBQueryConfig,
     ExtractTablesWithRelations,
     InferSelectModel,
+    relations,
     sql,
 } from "drizzle-orm";
 import {
@@ -12,6 +13,7 @@ import {
 } from "@/lib/data/data.enum";
 
 import * as schema from "@/lib/schema/drizzle/drizzle.schema";
+import { JobSchema } from "../zod/job.schema";
 
 type Schema = typeof schema;
 
@@ -35,11 +37,18 @@ export type InferResultType<
     }
 >;
 
+export type CompaniesWithJobs = InferResultType<
+    "company",
+    {
+        jobs: true;
+    }
+>;
+
 export const jobTypeEnum = pgEnum("jobtype", jte);
 
 export const workArrangementEnum = pgEnum("workarrangement", wae);
 
-export const userTable = pgTable("user", {
+export const user = pgTable("user", {
     id: text("id").primaryKey(),
     createdAt: timestamp("createdAt").default(sql`CURRENT_TIMESTAMP`),
     firstName: text("firstName"),
@@ -50,7 +59,7 @@ export const userTable = pgTable("user", {
     avatar: text("avatar"),
 });
 
-export const companyTable = pgTable("company", {
+export const company = pgTable("company", {
     id: text("id").primaryKey(),
     createdAt: timestamp("createdAt")
         .default(sql`CURRENT_TIMESTAMP`)
@@ -68,10 +77,14 @@ export const companyTable = pgTable("company", {
     company_NumEmployee: text("company_NumEmployee").notNull(),
     userId: text("userId")
         .notNull()
-        .references(() => userTable.id),
+        .references(() => user.id),
 });
 
-export const jobTable = pgTable("job", {
+export const companyRelations = relations(company, ({ many }) => ({
+    jobs: many(job),
+}));
+
+export const job = pgTable("job", {
     id: text("id").primaryKey(),
     createdAt: timestamp("createdAt")
         .default(sql`CURRENT_TIMESTAMP`)
@@ -92,22 +105,29 @@ export const jobTable = pgTable("job", {
     job_RedirectUrl: text("job_RedirectUrl"),
     userId: text("userId")
         .notNull()
-        .references(() => userTable.id),
+        .references(() => user.id),
     companyId: text("companyId")
         .notNull()
-        .references(() => companyTable.id),
+        .references(() => company.id),
 });
 
-export const sessionTable = pgTable("session", {
+export const jobRelations = relations(job, ({ one }) => ({
+    company: one(company, {
+        fields: [job.companyId],
+        references: [company.id],
+    }),
+}));
+
+export const session = pgTable("session", {
     id: text("id").primaryKey(),
     userId: text("user_id")
         .notNull()
-        .references(() => userTable.id),
+        .references(() => user.id),
     expiresAt: timestamp("expires_at", {
         withTimezone: true,
         mode: "date",
     }).notNull(),
 });
 
-export type Company = InferSelectModel<typeof companyTable>;
-export type Job = InferSelectModel<typeof jobTable>;
+export type Company = InferSelectModel<typeof company>;
+export type Job = InferSelectModel<typeof job>;

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { getUser } from "@/lib/auth";
 import DashboardHeader from "./_components/dashboard.header";
 import { redirect } from "next/navigation";
+import Loading from "@/app/loading";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
     title: "Hyre",
@@ -26,7 +28,9 @@ export default async function DashboardLayout({
         <div className="flex min-h-screen w-screen flex-col ">
             <DashboardHeader user={user} />
             <div className="flex w-full flex-1 flex-col-reverse md:flex-row">
-                <div className="h-auto w-full flex-1 ">{children}</div>
+                <div className="h-auto w-full flex-1 ">
+                    <Suspense fallback={<Loading />}>{children}</Suspense>
+                </div>
             </div>
         </div>
     );
